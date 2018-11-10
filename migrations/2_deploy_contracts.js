@@ -1,5 +1,5 @@
-const renting = artifacts.require("./Renting.sol");
+const assetContract = artifacts.require("./AssetContract.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(renting);
+  deployer.deploy(assetContract);
 };

@@ -11,6 +11,7 @@
     "drizzle-react": "^1.2.0",
     "drizzle-react-components": "^1.2.0",
     "ipfs-api": "^26.1.2",
+    "openzeppelin-solidity": "2.0.0",
     "prop-types": "^15.6.2",
     "react": "^16.6.1",
     "react-dom": "^16.6.1",
@@ -32,7 +33,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "copy-contracts": "cp build/contracts/Renting.json src/contracts",
+    "copy-contracts": "cp build/contracts/AssetContract.json src/contracts",
     "link-contracts": "run-script-os",
     "link-contracts:linux:darwin": "cd src && ln -s ../../build/contracts contracts",
     "link-contracts:win32": "cd src && mklink \\D contracts ..\\..\\build\\contracts"

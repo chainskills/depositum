@@ -6,31 +6,47 @@ import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
 
 import {ipfs} from "../../store/ipfs/ipfs";
-import ContractIPFS from '../ContractIPFS/ContractIPFS';
-import RentingDialog from './RentingDialog/RentingDialog';
+import ContractDataIPFS from '../ContractDataIPFS/ContractDataIPFS';
+import AssetDialog from './AssetDialog/AssetDialog';
 import AlertDialog from './AlertDialog/AlertDialog';
-import './Renting.css';
+import './Asset.css';
 
 
 
-class Renting extends Component {
+class Asset extends Component {
+
+    constructor(props, context) {
+        super(props)
+
+        this.state = {};
+
+        this.web3 = context.drizzle.web3;
+
+        this.assetContract = context.drizzle.contracts.AssetContract;
+        console.log("constructor -> this.assetContract: " + this.assetContract);
+
+        this.validAssetIDsKey = this.assetContract.methods.getMyAssets.cacheCall();
+        console.log("constructor -> this.validAssetIDsKey: " + this.validAssetIDsKey);
+    }
+
+
 
     handleNew = () => {
         this.setState({
             action: 'new',
-            dialogTitle: 'Create a new renting',
+            dialogTitle: 'Create a new asset',
             openDialog: true,
             openAlertDialog: false
         });
     }
 
-    addRentItem = (rentingItem) => {
+    addAsset = (asset) => {
         this.setState({openDialog: false});
         this.setState({openAlertDialog: false});
 
-        if (rentingItem.imageBuffer != null) {
-            // save the image to IPFS
-            ipfs.files.add(rentingItem.imageBuffer, {pin: true}, (error, result) => {
+        if (asset.imageBuffer != null) {
+            // save the document to IPFS
+            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
                 if (error) {
                     console.error(error)
                     return
@@ -38,40 +54,34 @@ class Renting extends Component {
 
                 console.log("Hash key: ", result[0].hash);
 
-                this.rentingContract.methods.addRentItem.cacheSend(rentingItem.title, rentingItem.description, result[0].hash,
-                    {
+                console.log("account: " + this.props.accounts[0]);
+
+                this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, 0, {
                         from: this.props.accounts[0],
                         gas: 500000
                     });
-            })
 
-        } else {
-            this.rentingContract.methods.addRentItem.cacheSend(rentingItem.title, rentingItem.description, "",
-                {
-                    from: this.props.accounts[0],
-                    gas: 500000
-                });
+            });
         }
     }
 
-    handleRemove = (itemId) => {
-        this.rentingContract.methods.getTitle(this.props.accounts[0], itemId).call().then(function (title) {
+    handleRemove = (assetId) => {
+        this.assetContract.methods.getName(assetId).call().then(function (name) {
             this.setState({
-                dialogTitle: 'Remove the renting',
-                title: title,
-                itemId: itemId,
+                dialogTitle: 'Remove the asset',
+                name: name,
+                assetId: assetId,
                 openDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
     }
 
-    removeRentItem = (itemId) => {
+    removeRentItem = (assetId) => {
         this.setState({openDialog: false});
         this.setState({openAlertDialog: false});
 
-        this.rentingContract.methods.removeRentItem.cacheSend(itemId,
-            {
+        this.assetContract.methods.removeAsset.cacheSend(assetId, {
                 from: this.props.accounts[0],
                 gas: 500000
             });
@@ -82,51 +92,44 @@ class Renting extends Component {
         this.setState({openAlertDialog: false});
     }
 
-    constructor(props, context) {
-        super(props)
-
-        this.state = {};
-
-        this.web3 = context.drizzle.web3;
-        this.rentingContract = context.drizzle.contracts.Renting;
-
-        this.validRentingItemIDsKey = this.rentingContract.methods.getValidRentItemIDs.cacheCall(this.props.accounts[0]);
-    }
 
     render() {
-        let rentItems = [];
+        let allAssets = [];
 
-        if (this.validRentingItemIDsKey in this.props.Renting.getValidRentItemIDs) {
-            const validRentItemIDs = this.props.Renting.getValidRentItemIDs[this.validRentingItemIDsKey].value;
+        console.log("Into render: " + JSON.stringify(this.props.AssetContract.getMyAssets));
+        if (this.validAssetIDsKey in this.props.AssetContract.getMyAssets) {
+            const validAssetIDs = this.props.AssetContract.getMyAssets[this.validAssetIDsKey].value;
+            console.log("validAssetIDs: " + validAssetIDs.length);
 
-            for (let i = 0; i < validRentItemIDs.length; i++) {
-                const rentItemId = validRentItemIDs[i];
+            for (let i = 0; i < validAssetIDs.length; i++) {
+                const assetId = validAssetIDs[i];
 
                 const item = (
-                    <Col xs={6} md={4} key={rentItemId} className="vertical-spacing">
+                    <Col xs={6} md={4} key={assetId} className="vertical-spacing">
                         <Card>
-                            <ContractIPFS contract="Renting" method="getImageHash"
-                                          methodArgs={[this.props.accounts[0], rentItemId]}/>
+                            <ContractDataIPFS contract="AssetContract" method="getHashKey"
+                                          methodArgs={assetId}/>
 
                             <CardBody>
                                 <CardTitle>
-                                    <ContractData contract="Renting" method="getTitle"
-                                                  methodArgs={[this.props.accounts[0], rentItemId]} hideIndicator/>
+                                    <ContractData contract="AssetContract" method="getName"
+                                                  methodArgs={assetId} hideIndicator/>
                                 </CardTitle>
                                 <CardText>
-                                    <ContractData contract="Renting" method="getDescription"
-                                                  methodArgs={[this.props.accounts[0], rentItemId]} hideIndicator/>
+                                    <ContractData contract="AssetContract" method="getDescription"
+                                                  methodArgs={assetId} hideIndicator/>
                                 </CardText>
                                 <Button variant="contained"
-                                        onClick={() => this.handleRemove(rentItemId)}>Remove</Button>
+                                        onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleRemove(rentItemId)}>Rent</Button>
+                                        onClick={() => this.handleRemove(assetId)}>Rent</Button>
                             </CardBody>
                         </Card>
                     </Col>);
 
-                rentItems.push(item);
+                allAssets.push(item);
+
             }
         }
 
@@ -134,8 +137,8 @@ class Renting extends Component {
             <div>
                 <Container>
                     <Jumbotron>
-                        <h2>Welcome to ChainBnB</h2>
-                        <p>This is an example of website developed in React and React Bootstrap</p>
+                        <h2>Welcome to Depositum</h2>
+                        <p>This is an example of Dapp that stores and sells your assets using Ethereum and IPFS</p>
                     </Jumbotron>
 
                     <Row>
@@ -152,23 +155,23 @@ class Renting extends Component {
                     </Row>
 
                     <Row>
-                        {rentItems}
+                        {allAssets}
                     </Row>
 
                 </Container>
 
-                <RentingDialog
+                <AssetDialog
                     action={this.state.action}
                     open={this.state.openDialog}
                     dialogTitle={this.state.dialogTitle}
-                    addRentItem={this.addRentItem.bind(this)}
+                    addAsset={this.addAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
                 <AlertDialog
                     open={this.state.openAlertDialog}
                     dialogTitle={this.state.dialogTitle}
-                    title={this.state.title}
-                    itemId={this.state.itemId}
+                    name={this.state.name}
+                    assetId={this.state.assetId}
                     removeRentItem={this.removeRentItem.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
             </div>
@@ -177,8 +180,8 @@ class Renting extends Component {
 }
 
 
-Renting.contextTypes = {
+Asset.contextTypes = {
     drizzle: PropTypes.object
 };
 
-export default Renting;
+export default Asset;

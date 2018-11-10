@@ -18,7 +18,7 @@ const styles = theme => ({
     }
 });
 
-class RentingDialog extends Component {
+class AssetDialog extends Component {
     constructor(props) {
         super(props);
 
@@ -26,7 +26,7 @@ class RentingDialog extends Component {
             action: '',
             openDialog: false,
             dialogTitle: '',
-            title: '',
+            name: '',
             description: '',
             imageBuffer: null,
             imageSource: 'assets/house.png'
@@ -45,10 +45,10 @@ class RentingDialog extends Component {
 
     checkValidity = (title, description) => {
         if (title.trim() === '') {
-            this.setState({titleError: true});
+            this.setState({nameError: true});
             return false;
         } else {
-            this.setState({titleError: false});
+            this.setState({nameError: false});
         }
 
         if (description.trim() === '') {
@@ -67,10 +67,10 @@ class RentingDialog extends Component {
         this.setState({openDialog: false});
     }
 
-    setTitle = (e) => {
+    setName = (e) => {
         this.setState({
-            title: e,
-            titleError: false
+            name: e,
+            nameError: false
         })
     }
 
@@ -81,16 +81,16 @@ class RentingDialog extends Component {
         })
     }
 
-    // Add a new rent item
-    addRentItem = (event) => {
-        const {title, description, imageBuffer} = this.state;
+    // Add a new asset
+    addAsset = (event) => {
+        const {name, description, imageBuffer} = this.state;
 
-        if (!this.checkValidity(title, description)) {
+        if (!this.checkValidity(name, description)) {
             return;
         }
 
-        let rentItem = {title, description, imageBuffer};
-        this.props.addRentItem(rentItem);
+        let asset = {name, description, imageBuffer};
+        this.props.addAsset(asset);
     }
 
     loadFile = (event) => {
@@ -107,16 +107,7 @@ class RentingDialog extends Component {
             this.setState({ imageSource: imageSource});
         };
 
-        //reader.readAsDataURL(selectedFile);
         reader.readAsArrayBuffer(selectedFile)
-
-        /*
-        reader.readAsArrayBuffer(file)
-        reader.onloadend = () => {
-            this.setState({ imageFile: Buffer(reader.result) })
-            console.log('buffer', this.state.imageFile)
-        }
-        */
     }
 
 
@@ -126,24 +117,24 @@ class RentingDialog extends Component {
         return (
             <div>
                 <Dialog
-                    id={"rentingdialog"}
+                    id={"assetdialog"}
                     open={(typeof this.state.openDialog === 'undefined') ? false : this.state.openDialog}
                     onClose={this.handleClose}
-                    aria-labelledby="rentingdialog-title"
+                    aria-labelledby="assetdialog-title"
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}
                     fullWidth={true}
                     maxWidth={'md'}
                 >
 
-                    <DialogTitle id="rentingdialog-title">{this.state.dialogTitle}</DialogTitle>
+                    <DialogTitle id="assetdialog-title">{this.state.dialogTitle}</DialogTitle>
 
                     <DialogContent>
 
                         <Grid container>
                             <Grid item xs={4} container direction="column" spacing={16}>
                                 <Grid item>
-                                    <img className={classes.img} style={{width: '250px'}} alt="renting"
+                                    <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${this.state.imageSource}`}/>
                                 </Grid>
                                 <Grid item>
@@ -152,12 +143,12 @@ class RentingDialog extends Component {
                             </Grid>
                             <Grid item xs={8} container direction="column" spacing={16}>
                                 <TextField
-                                    label="Title"
-                                    defaultValue={this.state.title}
+                                    label="Name"
+                                    defaultValue={this.state.name}
                                     fullWidth
-                                    error={this.state.titleError}
+                                    error={this.state.nameError}
                                     onChange={e => {
-                                        this.setTitle(e.target.value)
+                                        this.setName(e.target.value)
                                     }}
                                     margin="normal"
                                     InputProps={{
@@ -217,7 +208,7 @@ class RentingDialog extends Component {
                                 color="primary"
                                 focusRipple={true}
                                 onClick={() => {
-                                    this.addRentItem();
+                                    this.addAsset();
                                 }}>Save</Button>
                         </div>
                         }
@@ -230,4 +221,4 @@ class RentingDialog extends Component {
 }
 
 
-export default withStyles(styles)(RentingDialog);
+export default withStyles(styles)(AssetDialog);

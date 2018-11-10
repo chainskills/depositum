@@ -11,7 +11,7 @@ import {IPFS_READ_URL} from "../../store/ipfs/ipfs";
  * Create component.
  */
 
-class ContractIPFS extends Component {
+class ContractDataIPFS extends Component {
     constructor(props, context) {
         super(props);
 
@@ -46,7 +46,7 @@ class ContractIPFS extends Component {
     }
 }
 
-ContractIPFS.contextTypes = {
+ContractDataIPFS.contextTypes = {
     drizzle: PropTypes.object
 }
 
@@ -60,4 +60,4 @@ const mapStateToProps = state => {
     }
 }
 
-export default drizzleConnect(ContractIPFS, mapStateToProps);
+export default drizzleConnect(ContractDataIPFS, mapStateToProps);

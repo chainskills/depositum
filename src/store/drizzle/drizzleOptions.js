@@ -1,4 +1,4 @@
-import Renting from '../../contracts/Renting';
+import AssetContract from '../../contracts/AssetContract';
 
 const drizzleOptions = {
     web3: {
@@ -9,10 +9,10 @@ const drizzleOptions = {
         }
     },
     contracts: [
-        Renting
+        AssetContract
     ],
     events: {
-        Renting: ['NewRentItemEvent']
+        AssetContract: ['NewAsset', 'AssetRemoved']
     },
     polls: {
         accounts: 1500

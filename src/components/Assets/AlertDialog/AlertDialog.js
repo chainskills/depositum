@@ -15,7 +15,7 @@ class AlertDialog extends Component {
             openDialog: false,
             dialogTitle: '',
             title: '',
-            itemId: null
+            asset: null
         }
         this.handleClose = this.handleClose.bind(this);
     }
@@ -24,20 +24,20 @@ class AlertDialog extends Component {
         this.setState({
             dialogTitle: nextProps.dialogTitle,
             openDialog: nextProps.open,
-            title: nextProps.title,
-            itemId: nextProps.itemId
+            name: nextProps.title,
+            assetId: nextProps.assetId
         });
     }
 
 
-    //closes all modals
+    // closes all modals
     handleClose = () => {
         this.setState({openDialog: false});
     }
 
-    //  filters out specific item that is to be deleted and set that variable to state
-    removeRentItem = () => {
-        this.props.removeRentItem(this.state.itemId);
+    // filters out specific asset that is to be deleted and set that variable to state
+    removeAsset = () => {
+        this.props.removeRentItem(this.state.assetId);
     }
 
     render() {
@@ -55,7 +55,7 @@ class AlertDialog extends Component {
 
                     <DialogContent>
                         <DialogContentText>
-                            Are you sure to delete the rent item labeled: <b>{this.props.title}</b> ?
+                            Are you sure to delete the asset named: <b>{this.props.name}</b> ?
                         </DialogContentText>
                     </DialogContent>
 
@@ -72,7 +72,7 @@ class AlertDialog extends Component {
                             color="secondary"
                             focusRipple={true}
                             onClick={() => {
-                                this.removeRentItem();}}>
+                                this.removeAsset();}}>
                             Yes
                         </Button>
                     </DialogActions>
