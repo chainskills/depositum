@@ -23,13 +23,9 @@ class Asset extends Component {
         this.web3 = context.drizzle.web3;
 
         this.assetContract = context.drizzle.contracts.AssetContract;
-        console.log("constructor -> this.assetContract: " + this.assetContract);
 
         this.validAssetIDsKey = this.assetContract.methods.getMyAssets.cacheCall();
-        console.log("constructor -> this.validAssetIDsKey: " + this.validAssetIDsKey);
     }
-
-
 
     handleNew = () => {
         this.setState({
@@ -51,10 +47,6 @@ class Asset extends Component {
                     console.error(error)
                     return
                 }
-
-                console.log("Hash key: ", result[0].hash);
-
-                console.log("account: " + this.props.accounts[0]);
 
                 this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, 0, {
                         from: this.props.accounts[0],
@@ -96,10 +88,8 @@ class Asset extends Component {
     render() {
         let allAssets = [];
 
-        console.log("Into render: " + JSON.stringify(this.props.AssetContract.getMyAssets));
         if (this.validAssetIDsKey in this.props.AssetContract.getMyAssets) {
             const validAssetIDs = this.props.AssetContract.getMyAssets[this.validAssetIDsKey].value;
-            console.log("validAssetIDs: " + validAssetIDs.length);
 
             for (let i = 0; i < validAssetIDs.length; i++) {
                 const assetId = validAssetIDs[i];
