@@ -1,3 +1,4 @@
-This project create a dApp application powered with React, Redux and Bootstrap.
+# Depositum - Deposit your assets on Ethereum
+Sample Ethereum Dapp to deposit your assets on Ethereum.
 
-Inspired from: https://truffleframework.com/boxes/react-box-web3-todo
+This Dapp illustrates how to integrate IPFS with your Dapp.
