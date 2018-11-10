@@ -1,0 +1,20 @@
+.footer {
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    left: 0;
+    background-color: #343A40;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+
+.footer  a, a:focus, a:hover {
+    /* color: #fff; */
+    color: #3898CE;
+}
+
+.footer  p {
+    /*color: #3898CE; */
+    color: #698190;
+}
