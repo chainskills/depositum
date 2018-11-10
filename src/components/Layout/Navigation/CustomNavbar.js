@@ -33,7 +33,7 @@ class CustomNavbar extends Component {
                         </NavItem>
 
                         <NavItem>
-                            <NavLink tag={Link} to={"/renting"}>Rentings</NavLink>
+                            <NavLink tag={Link} to={"/assets"}>My Assets</NavLink>
                         </NavItem>
 
                         <NavItem>
