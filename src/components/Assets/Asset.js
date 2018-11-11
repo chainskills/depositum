@@ -132,8 +132,11 @@ class Asset extends Component {
                                                   methodArgs={assetId} hideIndicator/>
                                 </CardText>
 
-                                <Button variant="contained"
+                                <Button variant="contained" className={'card-button'}
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
+
+                                <Button variant="contained"
+                                        onClick={() => this.handleRemove(assetId)}>Edit</Button>
 
                                 <Button variant="contained" className={'float-right'}
                                         onClick={() => this.handleRemove(assetId)}>Sale</Button>

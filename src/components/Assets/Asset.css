@@ -33,6 +33,10 @@ h3 {
     object-fit: cover;
 }
 
+.card-button {
+    margin-right: 15px !important;
+}
+
 .network {
     font-weight: bold;
 }
