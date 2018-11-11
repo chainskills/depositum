@@ -10341,10 +10341,10 @@
         }
       },
       "links": {},
-      "address": "0x9599b5D096F26a9Fe8e6a27F0cEDF4590B768684",
-      "transactionHash": "0x0bd780aed92ea03dda3e7e9a4b7ee6ec1b2408f34233899190e96303a8b8a9a0"
+      "address": "0xa2a7DD44f750f556d85e9300ACd2280A4559f069",
+      "transactionHash": "0x60326ea96cb2acf247d82f9be9b7a300bc8b36a15605499774976e552a2853e9"
     }
   },
   "schemaVersion": "3.0.0-beta.1",
-  "updatedAt": "2018-11-10T17:43:01.113Z"
+  "updatedAt": "2018-11-11T10:51:32.451Z"
 }

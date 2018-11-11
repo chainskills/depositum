@@ -7,6 +7,7 @@ import {ContractData} from 'drizzle-react-components'
 
 import {ipfs} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
+import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import AssetDialog from './AssetDialog/AssetDialog';
 import AlertDialog from './AlertDialog/AlertDialog';
 import './Asset.css';
@@ -123,8 +124,8 @@ class Asset extends Component {
                                 </CardTitle>
 
                                 <CardSubtitle>
-                                    <ContractData contract="AssetContract" method="getPrice"
-                                                  methodArgs={assetId} hideIndicator/>
+                                    <ContractDataAmount contract="AssetContract" method="getPrice"
+                                                  methodArgs={assetId} fromWei="ether"/>
                                 </CardSubtitle>
 
                                 <CardText>
