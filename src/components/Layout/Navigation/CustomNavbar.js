@@ -23,7 +23,7 @@ class CustomNavbar extends Component {
         return (
             <Navbar expand="md" color="dark" dark>
                 <NavbarBrand href="/">
-                    <img src="assets/chainskills.png" height="50" alt="ChainSkills"/>
+                    <img src="/assets/chainskills.png" height="50" alt="ChainSkills"/>
                 </NavbarBrand>
                 <NavbarToggler onClick={this.toggle}/>
                 <Collapse isOpen={this.state.isOpen} navbar>

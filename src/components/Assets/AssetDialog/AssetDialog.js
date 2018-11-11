@@ -29,7 +29,7 @@ class AssetDialog extends Component {
             name: '',
             description: '',
             imageBuffer: null,
-            imageSource: 'assets/house.png'
+            imageSource: '/assets/house.png'
         };
 
         this.handleClose = this.handleClose.bind(this);

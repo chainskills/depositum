@@ -118,7 +118,7 @@ class Asset extends Component {
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleRemove(assetId)}>Rent</Button>
+                                        onClick={() => this.handleRemove(assetId)}>Sale</Button>
                             </CardBody>
                         </Card>
                     </Col>);
