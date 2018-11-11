@@ -283,7 +283,10 @@ class Asset extends Component {
                                         onClick={() => this.handleEdit(assetId)}>Edit</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleSetMarketplace(assetId)}>To Sale</Button>
+                                        onClick={() => this.handleSetMarketplace(assetId)}>Set</Button>
+
+                                <Button variant="contained" className={'float-right'}
+                                        onClick={() => this.handleUnsetMarketplace(assetId)}>Unset</Button>
                             </CardBody>
                         </Card>
                     </Col>);
