@@ -92,8 +92,14 @@ class Asset extends Component {
 
 
     render() {
+        // refresh balance
         this.web3.eth.getBalance(this.props.accounts[0]).then(function(_balance) {
             this.balance = this.web3.utils.fromWei(_balance, "ether");
+        }.bind(this));
+
+        // refresh network type
+        this.web3.eth.net.getNetworkType().then(function(_networkType) {
+            this.networkType = _networkType;
         }.bind(this));
 
         let allAssets = [];
@@ -146,6 +152,8 @@ class Asset extends Component {
                     <Jumbotron>
                         <h2>Welcome to Depositum</h2>
                         <p>This is an example of Dapp that stores and sells your assets using Ethereum and IPFS</p>
+                        <br/>
+                        <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>
                         <p>Your balance: {this.balance} ETH</p>
                     </Jumbotron>

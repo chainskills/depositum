@@ -33,6 +33,9 @@ h3 {
     object-fit: cover;
 }
 
+.network {
+    font-weight: bold;
+}
 
 @media only screen and (min-width: 768px) {
     .todo-description {
