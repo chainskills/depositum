@@ -39,7 +39,8 @@ contract AssetContract is Ownable {
     event NewAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
     event UpdateAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
     event AssetRemoved(address _owner, uint _id);
-    event Availability(uint256 _id, address _owner, string _name, string _description, uint256 _price, bool _available);
+    event SetMarketplace(uint256 _id, address _owner, string _name, string _description, uint256 _price);
+    event UnsetMarketplace(uint256 _id, address _owner, address _candidate, string _name, string _description, uint256 _price);
 
     //
     // Implementation
@@ -102,9 +103,9 @@ contract AssetContract is Ownable {
         emit UpdateAsset(_assetId, msg.sender, _name, _description, _hashKey, _price);
     }
 
-    // update the availability of the asset in the marketplace
+    // make the asset available in the marketplace
     // only possible for the asset's owner
-    function setAvailability(uint256 _assetId, bool _availability) public {
+    function setMarketplace(uint256 _assetId) public {
         AssetItem storage asset = assets[_assetId];
 
         // is this asset exists?
@@ -116,10 +117,32 @@ contract AssetContract is Ownable {
         require(msg.sender == asset.owner, "Action allowed only to the owner");
 
         // update the availability of the asset in the marketplace
-        asset.available = _availability;
+        asset.available = true;
 
-        emit Availability(_assetId, msg.sender, asset.name, asset.description, asset.price, _availability);
+        emit SetMarketplace(_assetId, msg.sender, asset.name, asset.description, asset.price);
     }
+
+    // remove the asset from the marketplace and refund the candidate buyer
+    // only possible for the asset's owner
+    function unsetMarketplace(uint256 _assetId) public {
+        AssetItem storage asset = assets[_assetId];
+
+        // is this asset exists?
+        if (asset.owner == 0x0) {
+            return;
+        }
+
+        // only the asset's owner is allowed to update this asset
+        require(msg.sender == asset.owner, "Action allowed only to the owner");
+
+        // update the availability of the asset in the marketplace
+        asset.available = false;
+
+        // TODO: refund the candidate buyer
+
+        emit UnsetMarketplace(_assetId, msg.sender, asset.candidate, asset.name, asset.description, asset.price);
+    }
+
 
     // remove an asset
     function removeAsset(uint _assetId) public {

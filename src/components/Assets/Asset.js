@@ -13,7 +13,6 @@ import AlertDialog from './AlertDialog/AlertDialog';
 import './Asset.css';
 
 
-
 class Asset extends Component {
 
     constructor(props, context) {
@@ -61,9 +60,9 @@ class Asset extends Component {
                 }
 
                 this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, price, {
-                        from: this.props.accounts[0],
-                        gas: 500000
-                    });
+                    from: this.props.accounts[0],
+                    gas: 500000
+                });
 
             });
         }
@@ -71,6 +70,9 @@ class Asset extends Component {
 
     handleEdit = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            console.log(asset);
+
             if (asset._owner === 0x0) {
                 // unable to fetch the asset
                 return;
@@ -140,12 +142,13 @@ class Asset extends Component {
             }
 
             let title = `Remove ${asset._name} ?`;
-            let message = `Are you sure to remove your asset ${additionalMessage}  ?`;
+            let message = `Are you sure to remove your asset ${additionalMessage} ?`;
 
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
+                action: this.removeItem.bind(this),
                 openDialog: false,
                 openAlertDialog: true
             });
@@ -156,23 +159,69 @@ class Asset extends Component {
         this.cancelDialog();
 
         this.assetContract.methods.removeAsset.cacheSend(assetId, {
-                from: this.props.accounts[0],
-                gas: 500000
-            });
+            from: this.props.accounts[0],
+            gas: 500000
+        });
     }
 
-    handleAvailability = (assetId) => {
-        this.assetContract.methods.getName(assetId).call().then(function (name) {
+    handleSetMarketplace = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            const title = `Available in the marketplace`;
+            const message = `Are you sure to set your asset available in the marketplace?`;
+
             this.setState({
-                dialogTitle: 'Remove the asset',
-                name: name,
+                dialogTitle: title,
+                message: message,
                 assetId: assetId,
+                action: this.setMarketplace.bind(this),
                 openDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
     }
 
+    handleUnsetMarketplace = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            let price = this.web3.utils.toWei(asset._price, "ether");
+
+            let additionalMessage = "";
+            if (this.web3.utils.toBN(asset._candidate).isZero() === false) {
+                additionalMessage = ` and to refund the candidate buyer of ${price} ETH `;
+            }
+
+            const title = `Remove from the marketplace`;
+            const message = `Are you sure to remove your asset from the marketplace ${additionalMessage} ?`;
+
+            this.setState({
+                dialogTitle: title,
+                message: message,
+                assetId: assetId,
+                action: this.unsetMarketplace.bind(this),
+                openDialog: false,
+                openAlertDialog: true
+            });
+        }.bind(this));
+    }
+
+    setMarketplace = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.setMarketplace.cacheSend(assetId, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
+
+    unsetMarketplace = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.unsetMarketplace.cacheSend(assetId, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
 
 
     cancelDialog = () => {
@@ -193,12 +242,12 @@ class Asset extends Component {
 
     render() {
         // refresh balance
-        this.web3.eth.getBalance(this.props.accounts[0]).then(function(_balance) {
+        this.web3.eth.getBalance(this.props.accounts[0]).then(function (_balance) {
             this.balance = this.web3.utils.fromWei(_balance, "ether");
         }.bind(this));
 
         // refresh network type
-        this.web3.eth.net.getNetworkType().then(function(_networkType) {
+        this.web3.eth.net.getNetworkType().then(function (_networkType) {
             this.networkType = _networkType;
         }.bind(this));
 
@@ -214,7 +263,7 @@ class Asset extends Component {
                     <Col xs={6} md={4} key={assetId} className="vertical-spacing">
                         <Card>
                             <ContractDataIPFS contract="AssetContract" method="getHashKey"
-                                          methodArgs={assetId}/>
+                                              methodArgs={assetId}/>
 
                             <CardBody>
                                 <CardTitle>
@@ -224,17 +273,17 @@ class Asset extends Component {
 
                                 <CardText>
                                     <ContractDataAmount contract="AssetContract" method="getPrice"
-                                                  methodArgs={assetId} fromWei="ether" units="ETH"/>
+                                                        methodArgs={assetId} fromWei="ether" units="ETH"/>
                                 </CardText>
 
-                                 <Button variant="contained" className={'card-button'}
+                                <Button variant="contained" className={'card-button'}
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
                                 <Button variant="contained"
                                         onClick={() => this.handleEdit(assetId)}>Edit</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleRemove(assetId)}>To Sale</Button>
+                                        onClick={() => this.handleSetMarketplace(assetId)}>To Sale</Button>
                             </CardBody>
                         </Card>
                     </Col>);
@@ -294,7 +343,7 @@ class Asset extends Component {
                     dialogTitle={this.state.dialogTitle}
                     message={this.state.message}
                     assetId={this.state.assetId}
-                    action={this.removeItem.bind(this)}
+                    action={this.state.action}
                     cancelDialog={this.cancelDialog.bind(this)}/>
             </div>
         );
