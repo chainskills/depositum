@@ -14,7 +14,7 @@ class AlertDialog extends Component {
         this.state = {
             openDialog: false,
             dialogTitle: '',
-            title: '',
+            message: '',
             asset: null
         }
         this.handleClose = this.handleClose.bind(this);
@@ -24,7 +24,7 @@ class AlertDialog extends Component {
         this.setState({
             dialogTitle: nextProps.dialogTitle,
             openDialog: nextProps.open,
-            name: nextProps.title,
+            message: nextProps.message,
             assetId: nextProps.assetId
         });
     }
@@ -33,11 +33,6 @@ class AlertDialog extends Component {
     // closes all modals
     handleClose = () => {
         this.setState({openDialog: false});
-    }
-
-    // filters out specific asset that is to be deleted and set that variable to state
-    removeAsset = () => {
-        this.props.removeRentItem(this.state.assetId);
     }
 
     render() {
@@ -55,7 +50,7 @@ class AlertDialog extends Component {
 
                     <DialogContent>
                         <DialogContentText>
-                            Are you sure to delete the asset named: <b>{this.props.name}</b> ?
+                            {this.props.message}
                         </DialogContentText>
                     </DialogContent>
 
@@ -72,7 +67,7 @@ class AlertDialog extends Component {
                             color="secondary"
                             focusRipple={true}
                             onClick={() => {
-                                this.removeAsset();}}>
+                                this.props.action(this.state.assetId);}}>
                             Yes
                         </Button>
                     </DialogActions>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Jumbotron, Card, CardBody, CardText, CardTitle, CardSubtitle, Col, Container, Row} from 'reactstrap';
+import {Jumbotron, Card, CardBody, CardText, CardTitle, Col, Container, Row} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
@@ -130,6 +130,38 @@ class Asset extends Component {
 
 
     handleRemove = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            let price = this.web3.utils.toWei(asset._price, "ether");
+
+            let additionalMessage = "";
+            if (this.web3.utils.toBN(asset._candidate).isZero() === false) {
+                additionalMessage = ` and to refund the candidate buyer of ${price} ETH `;
+            }
+
+            let title = `Remove ${asset._name} ?`;
+            let message = `Are you sure to remove your asset ${additionalMessage}  ?`;
+
+            this.setState({
+                dialogTitle: title,
+                message: message,
+                assetId: assetId,
+                openDialog: false,
+                openAlertDialog: true
+            });
+        }.bind(this));
+    }
+
+    removeItem = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.removeAsset.cacheSend(assetId, {
+                from: this.props.accounts[0],
+                gas: 500000
+            });
+    }
+
+    handleAvailability = (assetId) => {
         this.assetContract.methods.getName(assetId).call().then(function (name) {
             this.setState({
                 dialogTitle: 'Remove the asset',
@@ -141,14 +173,7 @@ class Asset extends Component {
         }.bind(this));
     }
 
-    removeRentItem = (assetId) => {
-        this.cancelDialog();
 
-        this.assetContract.methods.removeAsset.cacheSend(assetId, {
-                from: this.props.accounts[0],
-                gas: 500000
-            });
-    }
 
     cancelDialog = () => {
         this.setState({
@@ -197,24 +222,19 @@ class Asset extends Component {
                                                   methodArgs={assetId} hideIndicator/>
                                 </CardTitle>
 
-                                <CardSubtitle>
+                                <CardText>
                                     <ContractDataAmount contract="AssetContract" method="getPrice"
                                                   methodArgs={assetId} fromWei="ether" units="ETH"/>
-                                </CardSubtitle>
-
-                                <CardText>
-                                    <ContractData contract="AssetContract" method="getDescription"
-                                                  methodArgs={assetId} hideIndicator/>
                                 </CardText>
 
-                                <Button variant="contained" className={'card-button'}
+                                 <Button variant="contained" className={'card-button'}
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
                                 <Button variant="contained"
                                         onClick={() => this.handleEdit(assetId)}>Edit</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleRemove(assetId)}>Sale</Button>
+                                        onClick={() => this.handleRemove(assetId)}>To Sale</Button>
                             </CardBody>
                         </Card>
                     </Col>);
@@ -272,9 +292,9 @@ class Asset extends Component {
                 <AlertDialog
                     open={this.state.openAlertDialog}
                     dialogTitle={this.state.dialogTitle}
-                    name={this.state.name}
+                    message={this.state.message}
                     assetId={this.state.assetId}
-                    removeRentItem={this.removeRentItem.bind(this)}
+                    action={this.removeItem.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
             </div>
         );
