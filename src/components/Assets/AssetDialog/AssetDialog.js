@@ -5,7 +5,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
+import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import {withStyles} from '@material-ui/core/styles';
 
 
@@ -15,6 +18,9 @@ const styles = theme => ({
         fontSize: 18,
         padding: 5,
         lineHeight: 1.5
+    },
+    formControl: {
+        marginTop: theme.spacing.unit * 3,
     }
 });
 
@@ -183,6 +189,9 @@ class AssetDialog extends Component {
         reader.readAsArrayBuffer(selectedFile)
     }
 
+    handleChange = name => event => {
+        this.setState({ [name]: event.target.checked });
+    };
 
     render() {
         if ((typeof this.state.action === "undefined" || this.state.action === "")) {
@@ -225,6 +234,17 @@ class AssetDialog extends Component {
                                 </Grid>
                             </Grid>
                             <Grid item xs={8} container direction="column" spacing={16}>
+
+                                {/*<FormControl component="fieldset" className={classes.formControl}>
+                                    <FormLabel component="legend">Marketplace</FormLabel>
+                                    <Switch
+                                        checked={this.state.checkedB}
+                                        onChange={this.handleChange('checkedB')}
+                                        value="checkedB"
+                                        color="primary"
+                                    />
+                                </FormControl>*/}
+
                                 <TextField
                                     label="Name"
                                     defaultValue={this.state.name}
@@ -315,7 +335,7 @@ class AssetDialog extends Component {
 
                         {this.state.action === "edit" &&
                         <div>
-                            <Button
+                             <Button
                                 label="Cancel"
                                 color={"secondary"}
                                 onClick={() => {
