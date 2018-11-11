@@ -8,6 +8,8 @@ import {ContractData} from 'drizzle-react-components'
 import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
+import ContractDataMarketplace from '../ContractData/ContractDataMarketplace/ContractDataMarketplace';
+
 import AssetDialog from './AssetDialog/AssetDialog';
 import AlertDialog from './AlertDialog/AlertDialog';
 import './Asset.css';
@@ -282,11 +284,16 @@ class Asset extends Component {
                                 <Button variant="contained"
                                         onClick={() => this.handleEdit(assetId)}>Edit</Button>
 
-                                <Button variant="contained" className={'float-right'}
+                                {/*<Button variant="contained" className={'float-right'}
                                         onClick={() => this.handleSetMarketplace(assetId)}>Set</Button>
 
                                 <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleUnsetMarketplace(assetId)}>Unset</Button>
+                                        onClick={() => this.handleUnsetMarketplace(assetId)}>Unset</Button>*/}
+
+                                <ContractDataMarketplace contract="AssetContract" method="getAsset"
+                                                         assetId={assetId}
+                                                         actionSet={this.handleSetMarketplace.bind(this)}
+                                                         actionUnset={this.handleUnsetMarketplace.bind(this)}/>
                             </CardBody>
                         </Card>
                     </Col>);
