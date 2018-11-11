@@ -29,6 +29,7 @@ class AssetDialog extends Component {
             name: '',
             description: '',
             imageBuffer: null,
+            price: '',
             imageSource: '/assets/house.png'
         };
 
@@ -81,15 +82,21 @@ class AssetDialog extends Component {
         })
     }
 
+    setPrice = (e) => {
+        this.setState({
+            price: e
+        });
+    };
+
     // Add a new asset
     addAsset = (event) => {
-        const {name, description, imageBuffer} = this.state;
+        const {name, description, imageBuffer, price} = this.state;
 
         if (!this.checkValidity(name, description)) {
             return;
         }
 
-        let asset = {name, description, imageBuffer};
+        let asset = {name, description, imageBuffer, price};
         this.props.addAsset(asset);
     }
 
@@ -173,6 +180,23 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
+                                    }}
+                                />
+
+                                <TextField
+                                    label="Price (ETH)"
+                                    type="number"
+                                    defaultValue={this.state.price}
+                                    fullWidth
+                                    onChange={e => {
+                                        this.setPrice(e.target.value)
+                                    }}
+                                    margin="normal"
+                                    inputProps={{
+                                        classes: {
+                                            input: classes.textSettings,
+                                        },
+                                        step: 0.01
                                     }}
                                 />
                             </Grid>

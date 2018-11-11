@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Jumbotron, Card, CardBody, CardText, CardTitle, Col, Container, Row} from 'reactstrap';
+import {Jumbotron, Card, CardBody, CardText, CardTitle, CardSubtitle, Col, Container, Row} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
@@ -49,7 +49,12 @@ class Asset extends Component {
                     return
                 }
 
-                this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, 0, {
+                let price = asset.price;
+                if (price !== '') {
+                    price = this.web3.utils.toWei(price, "ether");
+                }
+
+                this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, price, {
                         from: this.props.accounts[0],
                         gas: 500000
                     });
@@ -110,10 +115,17 @@ class Asset extends Component {
                                     <ContractData contract="AssetContract" method="getName"
                                                   methodArgs={assetId} hideIndicator/>
                                 </CardTitle>
+
+                                <CardSubtitle>
+                                    <ContractData contract="AssetContract" method="getPrice"
+                                                  methodArgs={assetId} hideIndicator/>
+                                </CardSubtitle>
+
                                 <CardText>
                                     <ContractData contract="AssetContract" method="getDescription"
                                                   methodArgs={assetId} hideIndicator/>
                                 </CardText>
+
                                 <Button variant="contained"
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
