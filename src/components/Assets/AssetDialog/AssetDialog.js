@@ -39,6 +39,12 @@ class AssetDialog extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
+
+        if ((typeof nextProps.action === "undefined") || (nextProps.action === "")) {
+            // do not process this component if it's not required
+            return;
+        }
+
         let _imageSource = '/assets/house.png';
         if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
             _imageSource = nextProps.imageSource;
@@ -77,7 +83,8 @@ class AssetDialog extends Component {
 
     // close the form
     handleClose = () => {
-        this.setState({openDialog: false});
+        this.resetState();
+        this.props.cancelDialog();
     }
 
     setName = (e) => {
@@ -109,7 +116,25 @@ class AssetDialog extends Component {
         }
 
         let asset = {name, description, imageBuffer, price};
+
+        this.resetState();
         this.props.addAsset(asset);
+    }
+
+    // reset the component
+    resetState = () => {
+        this.setState({
+            action: '',
+            openDialog: false,
+            dialogTitle: '',
+            assetId: '',
+            name: '',
+            description: '',
+            imageBuffer: null,
+            price: '',
+            imageSource: '/assets/house.png',
+            newImageSource: ''
+        });
     }
 
     loadFile = (event) => {
@@ -131,10 +156,13 @@ class AssetDialog extends Component {
 
 
     render() {
+        if ((typeof this.state.action === "undefined" || this.state.action === "")) {
+            // do not render if it's not required
+            return null;
+        }
         const {classes} = this.props;
 
         // process image source
-        console.log(this.state.imageSource);
         let imageSourceNew = this.state.imageSource;
         if (this.state.newImageSource !== "") {
             imageSourceNew = this.state.newImageSource;

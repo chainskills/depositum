@@ -32,15 +32,20 @@ class Asset extends Component {
     handleNew = () => {
         this.setState({
             action: 'new',
-            dialogTitle: 'Create a new asset',
+            dialogTitle: 'Create new asset',
+            assetId: '',
+            owner: '',
+            name: '',
+            description: '',
+            imageSource: '',
+            price: '',
             openDialog: true,
             openAlertDialog: false
         });
     }
 
     addAsset = (asset) => {
-        this.setState({openDialog: false});
-        this.setState({openAlertDialog: false});
+        this.cancelDialog();
 
         if (asset.imageBuffer != null) {
             // save the document to IPFS
@@ -89,7 +94,6 @@ class Asset extends Component {
         }.bind(this));
     }
 
-
     handleRemove = (assetId) => {
         this.assetContract.methods.getName(assetId).call().then(function (name) {
             this.setState({
@@ -103,8 +107,7 @@ class Asset extends Component {
     }
 
     removeRentItem = (assetId) => {
-        this.setState({openDialog: false});
-        this.setState({openAlertDialog: false});
+        this.cancelDialog();
 
         this.assetContract.methods.removeAsset.cacheSend(assetId, {
                 from: this.props.accounts[0],
@@ -113,8 +116,18 @@ class Asset extends Component {
     }
 
     cancelDialog = () => {
-        this.setState({openDialog: false});
-        this.setState({openAlertDialog: false});
+        this.setState({
+            action: '',
+            dialogTitle: '',
+            assetId: '',
+            owner: '',
+            name: '',
+            description: '',
+            imageSource: '',
+            price: '',
+            openDialog: false,
+            openAlertDialog: false
+        });
     }
 
 
