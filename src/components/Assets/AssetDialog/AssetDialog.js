@@ -45,6 +45,13 @@ class AssetDialog extends Component {
             return;
         }
 
+        if (this.state.openDialog) {
+            // do not process this component if it's not required
+            return;
+        }
+
+        console.log("this.state.openDialog => " + this.state.openDialog);
+
         let _imageSource = '/assets/house.png';
         if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
             _imageSource = nextProps.imageSource;
@@ -111,6 +118,8 @@ class AssetDialog extends Component {
     addAsset = (event) => {
         const {name, description, imageBuffer, price} = this.state;
 
+        console.log("name =>" + name);
+
         if (!this.checkValidity(name, description)) {
             return;
         }
@@ -120,6 +129,26 @@ class AssetDialog extends Component {
         this.resetState();
         this.props.addAsset(asset);
     }
+
+    // Update the asset
+    updateAsset = (event) => {
+        const {assetId, name, description, imageBuffer, newImageSource, price} = this.state;
+
+        if (!this.checkValidity(name, description)) {
+            return;
+        }
+
+        const ipfsHashKey = newImageSource;
+
+        console.log(this.state);
+
+        let asset = {assetId, name, description, imageBuffer, ipfsHashKey, price};
+
+        this.resetState();
+        this.props.updateAsset(asset);
+    }
+
+
 
     // reset the component
     resetState = () => {
@@ -253,7 +282,7 @@ class AssetDialog extends Component {
                     </DialogContent>
 
                     <DialogActions>
-                        {this.state.action !== "new" &&
+                        {this.state.action === "read" &&
                         <div>
                             <Button
                                 label="Cancel"
@@ -280,6 +309,25 @@ class AssetDialog extends Component {
                                 focusRipple={true}
                                 onClick={() => {
                                     this.addAsset();
+                                }}>Save</Button>
+                        </div>
+                        }
+
+                        {this.state.action === "edit" &&
+                        <div>
+                            <Button
+                                label="Cancel"
+                                color={"secondary"}
+                                onClick={() => {
+                                    this.handleClose();
+                                    this.props.cancelDialog();
+                                }}>Cancel</Button>
+                            <Button
+                                label="Save"
+                                color="primary"
+                                focusRipple={true}
+                                onClick={() => {
+                                    this.updateAsset();
                                 }}>Save</Button>
                         </div>
                         }

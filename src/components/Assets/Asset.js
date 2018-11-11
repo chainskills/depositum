@@ -78,6 +78,8 @@ class Asset extends Component {
 
             const ipfsURL = IPFS_READ_URL + asset._hashKey;
 
+            const price = this.web3.utils.fromWei(asset._price, "ether");
+
             this.setState({
                 action: 'edit',
                 dialogTitle: 'Edit your asset',
@@ -85,14 +87,47 @@ class Asset extends Component {
                 owner: asset._owner,
                 name: asset._name,
                 description: asset._description,
+                ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
-                price: asset._price,
+                price: price,
                 openDialog: true,
                 openAlertDialog: false
             });
 
         }.bind(this));
     }
+
+    updateAsset = (asset) => {
+        this.cancelDialog();
+
+        let price = asset.price;
+        if (price !== '') {
+            price = this.web3.utils.toWei(price, "ether");
+        }
+
+        if (asset.imageBuffer != null) {
+            // save the document to IPFS
+            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
+                if (error) {
+                    console.error(error)
+                    return
+                }
+
+                this.assetContract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, {
+                    from: this.props.accounts[0],
+                    gas: 500000
+                });
+
+            });
+        } else {
+            // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
+            this.assetContract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.state.ipfsHashKey, price, {
+                from: this.props.accounts[0],
+                gas: 500000
+            });
+        }
+    }
+
 
     handleRemove = (assetId) => {
         this.assetContract.methods.getName(assetId).call().then(function (name) {
@@ -231,6 +266,7 @@ class Asset extends Component {
                     imageSource={this.state.imageSource}
                     price={this.state.price}
                     addAsset={this.addAsset.bind(this)}
+                    updateAsset={this.updateAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
                 <AlertDialog
