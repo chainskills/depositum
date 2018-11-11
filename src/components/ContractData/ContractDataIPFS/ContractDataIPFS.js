@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import {CardImg} from 'reactstrap';
 
-import {IPFS_READ_URL} from "../../store/ipfs/ipfs";
+import {IPFS_READ_URL} from "../../../store/ipfs/ipfs";
 
 
 

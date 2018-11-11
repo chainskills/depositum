@@ -6,7 +6,7 @@ import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
 
 import {ipfs} from "../../store/ipfs/ipfs";
-import ContractDataIPFS from '../ContractDataIPFS/ContractDataIPFS';
+import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import AssetDialog from './AssetDialog/AssetDialog';
 import AlertDialog from './AlertDialog/AlertDialog';
 import './Asset.css';
