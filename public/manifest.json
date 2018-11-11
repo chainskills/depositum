@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Depositum",
+  "name": "Store and manage your assets on Ethereum",
   "icons": [
     {
       "src": "favicon.ico",
