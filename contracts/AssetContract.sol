@@ -36,6 +36,7 @@ contract AssetContract is Ownable {
     // Events
     //
     event NewAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
+    event UpdateAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
     event AssetRemoved(address _owner, uint _id);
 
 
@@ -66,17 +67,52 @@ contract AssetContract is Ownable {
         emit NewAsset(assetCounter, msg.sender, _name, _description, _hashKey, _price);
     }
 
-    // remove an asset
-    function removeAsset(uint _assetId) public {
+    // update an existing asset
+    // only possible for the asset's owner
+    function updateAsset(uint256 _assetId, string _name, string _description, string _hashKey, uint256 _price) public {
         AssetItem storage asset = assets[_assetId];
 
-        // ensure that we have an asset to remove
+        // is this asset exists?
         if (asset.owner == 0x0) {
             return;
         }
 
-        // only the asset's owner is allowed to delete his/her asset
-        require(msg.sender == asset.owner, "Action allowed by the owner");
+        // only the asset's owner is allowed to update this asset
+        require(msg.sender == asset.owner, "Action allowed only to the owner");
+
+        // a name is required
+        bytes memory name = bytes(_name);
+        require(name.length > 0, "A name is required");
+
+        // a description is required
+        bytes memory description = bytes(_description);
+        require(description.length > 0, "A description is required");
+
+        // an IPFS hash key is required
+        bytes memory hashKey = bytes(_hashKey);
+        require(hashKey.length > 0, "A hash key from IPFS is required");
+
+        // update the asset
+        asset.name = _name;
+        asset.description = _description;
+        asset.hashKey = _hashKey;
+        asset.price = _price;
+
+        emit UpdateAsset(_assetId, msg.sender, _name, _description, _hashKey, _price);
+    }
+
+
+    // remove an asset
+    function removeAsset(uint _assetId) public {
+        AssetItem storage asset = assets[_assetId];
+
+        // is this asset exists?
+        if (asset.owner == 0x0) {
+            return;
+        }
+
+        // only the asset's owner is allowed to remove this asset
+        require(msg.sender == asset.owner, "Action allowed only to the owner");
 
         // remove the asset
         delete assets[_assetId];
@@ -111,6 +147,31 @@ contract AssetContract is Ownable {
         }
 
         return myAsset;
+    }
+
+
+    function getAsset(uint _assetId) view public returns (
+        address _owner,
+        address _candidate,
+        string _name,
+        string _description,
+        string _hashKey,
+        uint256 _price) {
+
+        AssetItem memory asset = assets[_assetId];
+
+        // ensure that we have an asset to remove
+        if (asset.owner == 0x0) {
+            return (0x0, 0x0, "", "", "", 0);
+        }
+
+        return (
+            asset.owner,
+            asset.candidate,
+            asset.name,
+            asset.description,
+            asset.hashKey,
+            asset.price);
     }
 
 

@@ -26,21 +26,33 @@ class AssetDialog extends Component {
             action: '',
             openDialog: false,
             dialogTitle: '',
+            assetId: '',
             name: '',
             description: '',
             imageBuffer: null,
             price: '',
-            imageSource: '/assets/house.png'
+            imageSource: '/assets/house.png',
+            newImageSource: ''
         };
 
         this.handleClose = this.handleClose.bind(this);
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
+        let _imageSource = '/assets/house.png';
+        if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
+            _imageSource = nextProps.imageSource;
+        }
+
         this.setState({
             action: nextProps.action,
             openDialog: nextProps.open,
-            dialogTitle: nextProps.dialogTitle
+            dialogTitle: nextProps.dialogTitle,
+            assetId: nextProps.assetId,
+            name: nextProps.name,
+            description: nextProps.description,
+            price: nextProps.price,
+            imageSource: _imageSource
         });
     }
 
@@ -111,7 +123,7 @@ class AssetDialog extends Component {
             const blob = new Blob([reader.result], {type: 'image/png'});
             let imageSource = URL.createObjectURL(blob);
 
-            this.setState({ imageSource: imageSource});
+            this.setState({ newImageSource: imageSource});
         };
 
         reader.readAsArrayBuffer(selectedFile)
@@ -120,6 +132,13 @@ class AssetDialog extends Component {
 
     render() {
         const {classes} = this.props;
+
+        // process image source
+        console.log(this.state.imageSource);
+        let imageSourceNew = this.state.imageSource;
+        if (this.state.newImageSource !== "") {
+            imageSourceNew = this.state.newImageSource;
+        }
 
         return (
             <div>
@@ -142,7 +161,7 @@ class AssetDialog extends Component {
                             <Grid item xs={4} container direction="column" spacing={16}>
                                 <Grid item>
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
-                                         src={`${this.state.imageSource}`}/>
+                                         src={`${imageSourceNew}`}/>
                                 </Grid>
                                 <Grid item>
                                     <input type='file' onChange={this.loadFile}/>

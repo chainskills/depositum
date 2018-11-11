@@ -33,10 +33,8 @@ class ContractDataAmount extends Component {
         }
 
         let displayData = this.props.contracts[this.props.contract][this.props.method][this.dataKey].value;
-        console.log("displayData: " + displayData);
 
         // Optionally convert from Wei
-        console.log("unit: " + this.props.fromWei);
         if (this.props.fromWei) {
             displayData = this.context.drizzle.web3.utils.fromWei(displayData, this.props.fromWei);
         }
@@ -46,7 +44,13 @@ class ContractDataAmount extends Component {
             displayData = this.context.drizzle.web3.utils.toWei(displayData, this.props.toWei);
         }
 
-        return(displayData);
+        // Optionally append the units
+        let units = "";
+        if (this.props.units) {
+            units = this.props.units;
+        }
+
+        return(`${displayData} ${units}`);
     }
 }
 

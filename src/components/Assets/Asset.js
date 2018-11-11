@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button';
 import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
 
-import {ipfs} from "../../store/ipfs/ipfs";
+import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import AssetDialog from './AssetDialog/AssetDialog';
@@ -63,6 +63,32 @@ class Asset extends Component {
             });
         }
     }
+
+    handleEdit = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+            if (asset._owner === 0x0) {
+                // unable to fetch the asset
+                return;
+            }
+
+            const ipfsURL = IPFS_READ_URL + asset._hashKey;
+
+            this.setState({
+                action: 'edit',
+                dialogTitle: 'Edit your asset',
+                assetId: assetId,
+                owner: asset._owner,
+                name: asset._name,
+                description: asset._description,
+                imageSource: ipfsURL,
+                price: asset._price,
+                openDialog: true,
+                openAlertDialog: false
+            });
+
+        }.bind(this));
+    }
+
 
     handleRemove = (assetId) => {
         this.assetContract.methods.getName(assetId).call().then(function (name) {
@@ -125,7 +151,7 @@ class Asset extends Component {
 
                                 <CardSubtitle>
                                     <ContractDataAmount contract="AssetContract" method="getPrice"
-                                                  methodArgs={assetId} fromWei="ether"/>
+                                                  methodArgs={assetId} fromWei="ether" units="ETH"/>
                                 </CardSubtitle>
 
                                 <CardText>
@@ -137,7 +163,7 @@ class Asset extends Component {
                                         onClick={() => this.handleRemove(assetId)}>Remove</Button>
 
                                 <Button variant="contained"
-                                        onClick={() => this.handleRemove(assetId)}>Edit</Button>
+                                        onClick={() => this.handleEdit(assetId)}>Edit</Button>
 
                                 <Button variant="contained" className={'float-right'}
                                         onClick={() => this.handleRemove(assetId)}>Sale</Button>
@@ -185,6 +211,12 @@ class Asset extends Component {
                     action={this.state.action}
                     open={this.state.openDialog}
                     dialogTitle={this.state.dialogTitle}
+                    assetId={this.state.assetId}
+                    owner={this.state.owner}
+                    name={this.state.name}
+                    description={this.state.description}
+                    imageSource={this.state.imageSource}
+                    price={this.state.price}
                     addAsset={this.addAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
