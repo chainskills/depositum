@@ -25,6 +25,7 @@ class Asset extends Component {
         this.assetContract = context.drizzle.contracts.AssetContract;
 
         this.validAssetIDsKey = this.assetContract.methods.getMyAssets.cacheCall();
+
     }
 
     handleNew = () => {
@@ -86,6 +87,10 @@ class Asset extends Component {
 
 
     render() {
+        this.web3.eth.getBalance(this.props.accounts[0]).then(function(_balance) {
+            this.balance = this.web3.utils.fromWei(_balance, "ether");
+        }.bind(this));
+
         let allAssets = [];
 
         if (this.validAssetIDsKey in this.props.AssetContract.getMyAssets) {
@@ -129,6 +134,8 @@ class Asset extends Component {
                     <Jumbotron>
                         <h2>Welcome to Depositum</h2>
                         <p>This is an example of Dapp that stores and sells your assets using Ethereum and IPFS</p>
+                        <p>Your account: {this.props.accounts[0]}</p>
+                        <p>Your balance: {this.balance} ETH</p>
                     </Jumbotron>
 
                     <Row>
