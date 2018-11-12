@@ -101,6 +101,37 @@ class Marketplace extends Component {
         }.bind(this));
     }
 
+    handleDetails = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            console.log(asset);
+
+            if (asset._owner === 0x0) {
+                // unable to fetch the asset
+                return;
+            }
+
+            const ipfsURL = IPFS_READ_URL + asset._hashKey;
+
+            const price = this.web3.utils.fromWei(asset._price, "ether");
+
+            this.setState({
+                action: 'read',
+                dialogTitle: 'Details of the asset',
+                assetId: assetId,
+                owner: asset._owner,
+                name: asset._name,
+                description: asset._description,
+                ipfsHashKey: asset._hashKey,
+                imageSource: ipfsURL,
+                price: price,
+                openDialog: true,
+                openAlertDialog: false
+            });
+
+        }.bind(this));
+    }
+
     updateAsset = (asset) => {
         this.cancelDialog();
 
@@ -278,23 +309,14 @@ class Marketplace extends Component {
                                                         methodArgs={assetId} fromWei="ether" units="ETH"/>
                                 </CardText>
 
-                                <Button variant="contained" className={'card-button'}
-                                        onClick={() => this.handleRemove(assetId)}>Remove</Button>
-
-                                <Button variant="contained"
-                                        onClick={() => this.handleEdit(assetId)}>Edit</Button>
-
-                                {/*<Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleSetMarketplace(assetId)}>Set</Button>
-
-                                <Button variant="contained" className={'float-right'}
-                                        onClick={() => this.handleUnsetMarketplace(assetId)}>Unset</Button>*/}
-
                                 <ContractDataMarketplace contract="AssetContract" method="getAsset"
                                                          assetId={assetId}
                                                          account={this.props.accounts[0]}
                                                          actionSet={this.handleSetMarketplace.bind(this)}
-                                                         actionUnset={this.handleUnsetMarketplace.bind(this)}/>
+                                                         actionUnset={this.handleUnsetMarketplace.bind(this)}
+                                                         actionRemove={this.handleRemove.bind(this)}
+                                                         actionEdit={this.handleEdit.bind(this)}
+                                                         actionView={this.handleDetails.bind(this)}/>
                             </CardBody>
                         </Card>
                     </Col>);
@@ -309,7 +331,8 @@ class Marketplace extends Component {
                 <Container>
                     <Jumbotron>
                         <h2>Depositum Marketplace</h2>
-                        <p>You will find your assets you have published in the marketplace and those put on sale by other individuals</p>
+                        <p>You will find your assets you have published in the marketplace and those put on sale by
+                            other individuals</p>
                         <br/>
                         <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>

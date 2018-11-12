@@ -5,12 +5,8 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
-import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
-import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 import {withStyles} from '@material-ui/core/styles';
-
 
 
 const styles = theme => ({
@@ -155,7 +151,6 @@ class AssetDialog extends Component {
     }
 
 
-
     // reset the component
     resetState = () => {
         this.setState({
@@ -178,19 +173,19 @@ class AssetDialog extends Component {
         const reader = new FileReader()
 
         reader.onloadend = () => {
-            this.setState({ imageBuffer: Buffer(reader.result)});
+            this.setState({imageBuffer: Buffer(reader.result)});
 
             const blob = new Blob([reader.result], {type: 'image/png'});
             let imageSource = URL.createObjectURL(blob);
 
-            this.setState({ newImageSource: imageSource});
+            this.setState({newImageSource: imageSource});
         };
 
         reader.readAsArrayBuffer(selectedFile)
     }
 
     handleChange = name => event => {
-        this.setState({ [name]: event.target.checked });
+        this.setState({[name]: event.target.checked});
     };
 
     render() {
@@ -229,21 +224,13 @@ class AssetDialog extends Component {
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${imageSourceNew}`}/>
                                 </Grid>
+                                {this.state.action !== "read" &&
                                 <Grid item>
                                     <input type='file' onChange={this.loadFile}/>
                                 </Grid>
+                                }
                             </Grid>
                             <Grid item xs={8} container direction="column" spacing={16}>
-
-                                {/*<FormControl component="fieldset" className={classes.formControl}>
-                                    <FormLabel component="legend">Marketplace</FormLabel>
-                                    <Switch
-                                        checked={this.state.checkedB}
-                                        onChange={this.handleChange('checkedB')}
-                                        value="checkedB"
-                                        color="primary"
-                                    />
-                                </FormControl>*/}
 
                                 <TextField
                                     label="Name"
@@ -258,6 +245,7 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
+                                        readOnly: this.state.action === "read" ? true : false
                                     }}
                                 />
 
@@ -276,6 +264,7 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
+                                        readOnly: this.state.action === "read" ? true : false
                                     }}
                                 />
 
@@ -292,7 +281,8 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
-                                        step: 0.01
+                                        step: 0.01,
+                                        readOnly: this.state.action === "read" ? true : false
                                     }}
                                 />
                             </Grid>
@@ -305,12 +295,12 @@ class AssetDialog extends Component {
                         {this.state.action === "read" &&
                         <div>
                             <Button
-                                label="Cancel"
+                                label="Close"
                                 color={"secondary"}
                                 onClick={() => {
                                     this.handleClose();
                                     this.props.cancelDialog();
-                                }}>Cancel</Button>
+                                }}>Close</Button>
                         </div>
                         }
 
@@ -335,7 +325,7 @@ class AssetDialog extends Component {
 
                         {this.state.action === "edit" &&
                         <div>
-                             <Button
+                            <Button
                                 label="Cancel"
                                 color={"secondary"}
                                 onClick={() => {

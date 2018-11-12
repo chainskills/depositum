@@ -34,16 +34,26 @@ class ContractDataMarketplace extends Component {
         const asset = this.props.contracts[this.props.contract][this.props.method][this.dataKey].value;
         if (asset._owner !== this.props.account) {
             // only the asset's owner is allowed to set/unset the asset to/from the marketplace
-            return (null);
+            return (<Button variant="contained" key={`button-view-${this.props.assetId}`}
+                            onClick={() => this.props.actionView(this.props.assetId)}>View</Button>);
         }
 
+        const buttons = [
+            <Button variant="contained" className={'card-button'} key={`button-remove-${this.props.assetId}`}
+                    onClick={() =>this.props.actionRemove(this.props.assetId)}>Remove</Button>,
+            <Button variant="contained" key={`button-edit-${this.props.assetId}`}
+            onClick={() => this.props.actionEdit(this.props.assetId)}>Edit</Button>
+        ]
+
         if (asset._available) {
-            return (<Button variant="contained" className={'float-right'}
-                            onClick={() => this.props.actionUnset(this.props.assetId)}>Unset</Button>);
+            buttons.push(<Button variant="contained" className={'float-right'} key={`button-unset-${this.props.assetId}`}
+                                 onClick={() => this.props.actionUnset(this.props.assetId)}>Unset</Button>);
         } else {
-            return (<Button variant="contained" className={'float-right'}
+            buttons.push(<Button variant="contained" className={'float-right'} key={`button-set-${this.props.assetId}`}
                             onClick={() => this.props.actionSet(this.props.assetId)}>Set</Button>);
         }
+
+        return buttons;
     }
 }
 
