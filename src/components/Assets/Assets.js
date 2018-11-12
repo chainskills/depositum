@@ -8,7 +8,7 @@ import {ContractData} from 'drizzle-react-components'
 import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
-import ContractDataMarketplace from '../ContractData/ContractDataMarketplace/ContractDataMarketplace';
+import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
@@ -73,9 +73,7 @@ class Assets extends Component {
     handleEdit = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
-            console.log(asset);
-
-            if (asset._owner === 0x0) {
+            if (asset._owner === "0x0000000000000000000000000000000000000000") {
                 // unable to fetch the asset
                 return;
             }
@@ -104,9 +102,7 @@ class Assets extends Component {
     handleDetails = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
-            console.log(asset);
-
-            if (asset._owner === 0x0) {
+            if (asset._owner === "0x0000000000000000000000000000000000000000") {
                 // unable to fetch the asset
                 return;
             }
@@ -167,7 +163,7 @@ class Assets extends Component {
     handleRemove = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
-            let price = this.web3.utils.toWei(asset._price, "ether");
+            let price = this.web3.utils.fromWei(asset._price, "ether");
 
             let additionalMessage = "";
             if (this.web3.utils.toBN(asset._candidate).isZero() === false) {
@@ -214,10 +210,19 @@ class Assets extends Component {
         }.bind(this));
     }
 
+    setMarketplace = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.setMarketplace.cacheSend(assetId, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
+
     handleUnsetMarketplace = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
-            let price = this.web3.utils.toWei(asset._price, "ether");
+            let price = this.web3.utils.fromWei(asset._price, "ether");
 
             let additionalMessage = "";
             if (this.web3.utils.toBN(asset._candidate).isZero() === false) {
@@ -238,15 +243,6 @@ class Assets extends Component {
         }.bind(this));
     }
 
-    setMarketplace = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.setMarketplace.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
-    }
-
     unsetMarketplace = (assetId) => {
         this.cancelDialog();
 
@@ -256,6 +252,92 @@ class Assets extends Component {
         });
     }
 
+    handleDeposit = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            let price = this.web3.utils.fromWei(asset._price, "ether");
+
+            const title = `Set an purchase option`;
+            const message = `Are you sure to deposit an option of ${price} ETH for the purchase of this asset?`;
+
+            this.setState({
+                dialogTitle: title,
+                message: message,
+                assetId: assetId,
+                action: this.deposit.bind(this),
+                openDialog: false,
+                openAlertDialog: true
+            });
+        }.bind(this));
+    }
+
+    deposit = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+            this.assetContract.methods.deposit.cacheSend(assetId, {
+                from: this.props.accounts[0],
+                value: asset._price,
+                gas: 500000
+            });
+        }.bind(this));
+    }
+
+    handlePurchase = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            let price = this.web3.utils.fromWei(asset._price, "ether");
+
+            const title = `Purchase the asset`;
+            const message = `Are you sure to purchase the asset by transferring your deposit of ${price} ETH to the owner?`;
+
+            this.setState({
+                dialogTitle: title,
+                message: message,
+                assetId: assetId,
+                action: this.purchaseAsset.bind(this),
+                openDialog: false,
+                openAlertDialog: true
+            });
+        }.bind(this));
+    }
+
+    purchaseAsset = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.purchaseAsset.cacheSend(assetId, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
+
+    handleRefund = (assetId) => {
+        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
+
+            let price = this.web3.utils.fromWei(asset._price, "ether");
+
+            const title = `Refund`;
+            const message = `Are you sure to cancel your purchase and be refunded of your deposit of ${price} ETH?`;
+
+            this.setState({
+                dialogTitle: title,
+                message: message,
+                assetId: assetId,
+                action: this.refundPurchase.bind(this),
+                openDialog: false,
+                openAlertDialog: true
+            });
+        }.bind(this));
+    }
+
+    refundPurchase = (assetId) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.refundPurchase.cacheSend(assetId, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
 
     cancelDialog = () => {
         this.setState({
@@ -290,6 +372,10 @@ class Assets extends Component {
         if (this.validAssetIDsKey in this.props.AssetContract[this.props.fetchMethod]) {
             const validAssetIDs = this.props.AssetContract[this.props.fetchMethod][this.validAssetIDsKey].value;
 
+            if (typeof validAssetIDs == "undefined") {
+                return null;
+            }
+
             for (let i = 0; i < validAssetIDs.length; i++) {
                 const assetId = validAssetIDs[i];
 
@@ -310,14 +396,17 @@ class Assets extends Component {
                                                         methodArgs={assetId} fromWei="ether" units="ETH"/>
                                 </CardText>
 
-                                <ContractDataMarketplace contract={this.assetContract.contractName} method="getAsset"
-                                                         assetId={assetId}
-                                                         account={this.props.accounts[0]}
-                                                         actionSet={this.handleSetMarketplace.bind(this)}
-                                                         actionUnset={this.handleUnsetMarketplace.bind(this)}
-                                                         actionRemove={this.handleRemove.bind(this)}
-                                                         actionEdit={this.handleEdit.bind(this)}
-                                                         actionView={this.handleDetails.bind(this)}/>
+                                <ContractDataActions contract={this.assetContract.contractName} method="getAsset"
+                                                     assetId={assetId}
+                                                     account={this.props.accounts[0]}
+                                                     actionSet={this.handleSetMarketplace.bind(this)}
+                                                     actionUnset={this.handleUnsetMarketplace.bind(this)}
+                                                     actionRemove={this.handleRemove.bind(this)}
+                                                     actionEdit={this.handleEdit.bind(this)}
+                                                     actionView={this.handleDetails.bind(this)}
+                                                     actionDeposit={this.handleDeposit.bind(this)}
+                                                     actionPurchase={this.handlePurchase.bind(this)}
+                                                     actionRefund={this.handleRefund.bind(this)}/>
                             </CardBody>
                         </Card>
                     </Col>);

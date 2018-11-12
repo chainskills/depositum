@@ -144,9 +144,27 @@ contract AssetContract is Ownable {
         // update the availability of the asset in the marketplace
         asset.available = false;
 
-        // TODO: refund the candidate buyer
+        if (asset.candidate != 0x0) {
+            // we need to refund by sending back the deposit to the candidate
 
-        emit UnsetMarketplace(_assetId, msg.sender, asset.candidate, asset.name, asset.description, asset.price);
+            // keep the former owner and the price paid by the purchase
+            address _candidate = asset.candidate;
+            uint256 _price = depositsBalance[_assetId];
+
+            // move the asset to the buyer and reset its state
+            asset.candidate = 0x0;
+            delete depositsBalance[_assetId];
+
+            // TODO: if the price is equal to zero, avoid the call to transfer
+
+            // transfer the amount to the former owner
+            _candidate.transfer(_price);
+
+            emit Refund(_assetId, asset.owner, msg.sender, _price);
+        } else {
+            emit UnsetMarketplace(_assetId, msg.sender, asset.candidate, asset.name, asset.description, asset.price);
+
+        }
     }
 
     // a candidate buyer deposit the price for the purchase
@@ -178,7 +196,7 @@ contract AssetContract is Ownable {
     }
 
     // let the candidate buyer to become the new owner of the asset by executing the purchase
-    function purchaseAsset(uint256 _assetId) public payable {
+    function purchaseAsset(uint256 _assetId) public {
         AssetItem storage asset = assets[_assetId];
 
         // is this asset exists?
@@ -207,7 +225,7 @@ contract AssetContract is Ownable {
     }
 
     // let the candidate buyer or the asset owner to cancel the purchase and refunding the candidate
-    function refundPurchase(uint256 _assetId) public payable {
+    function refundPurchase(uint256 _assetId) public {
         AssetItem storage asset = assets[_assetId];
 
         // is this asset exists?
@@ -216,22 +234,24 @@ contract AssetContract is Ownable {
         }
 
         // the sender must be the owner or the candidate
-        if (!(asset.owner == msg.sender) || (asset.candidate == msg.sender)) {
+        if ((msg.sender == asset.owner) || (msg.sender == asset.candidate)) {
+            // keep the former owner and the price paid by the purchase
+            address _candidate = asset.candidate;
+            uint256 _price = depositsBalance[_assetId];
+
+            // move the asset to the buyer and reset its state
+            asset.candidate = 0x0;
+            delete depositsBalance[_assetId];
+
+            if (_price != 0) {
+                // transfer back the amount to the candidate
+                _candidate.transfer(_price);
+            }
+
+            emit Refund(_assetId, asset.owner, msg.sender, _price);
+        } else {
             require(false, "Refund not authorised for this account");
         }
-
-        // keep the former owner and the price paid by the purchase
-        address _candidate = asset.candidate;
-        uint256 _price = depositsBalance[_assetId];
-
-        // move the asset to the buyer and reset its state
-        asset.candidate = 0x0;
-        delete depositsBalance[_assetId];
-
-        // transfer the amount to the former owner
-        _candidate.transfer(_price);
-
-        emit Refund(_assetId, asset.owner, msg.sender, _price);
     }
 
     // remove an asset

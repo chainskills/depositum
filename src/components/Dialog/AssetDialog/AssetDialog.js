@@ -52,8 +52,6 @@ class AssetDialog extends Component {
             return;
         }
 
-        console.log("this.state.openDialog => " + this.state.openDialog);
-
         let _imageSource = '/assets/house.png';
         if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
             _imageSource = nextProps.imageSource;
@@ -120,8 +118,6 @@ class AssetDialog extends Component {
     addAsset = (event) => {
         const {name, description, imageBuffer, price} = this.state;
 
-        console.log("name =>" + name);
-
         if (!this.checkValidity(name, description)) {
             return;
         }
@@ -141,8 +137,6 @@ class AssetDialog extends Component {
         }
 
         const ipfsHashKey = newImageSource;
-
-        console.log(this.state);
 
         let asset = {assetId, name, description, imageBuffer, ipfsHashKey, price};
 
