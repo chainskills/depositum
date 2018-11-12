@@ -32,6 +32,10 @@ class ContractDataMarketplace extends Component {
         }
 
         const asset = this.props.contracts[this.props.contract][this.props.method][this.dataKey].value;
+        if (asset._owner !== this.props.account) {
+            // only the asset's owner is allowed to set/unset the asset to/from the marketplace
+            return (null);
+        }
 
         if (asset._available) {
             return (<Button variant="contained" className={'float-right'}

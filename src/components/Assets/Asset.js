@@ -292,6 +292,7 @@ class Asset extends Component {
 
                                 <ContractDataMarketplace contract="AssetContract" method="getAsset"
                                                          assetId={assetId}
+                                                         account={this.props.accounts[0]}
                                                          actionSet={this.handleSetMarketplace.bind(this)}
                                                          actionUnset={this.handleUnsetMarketplace.bind(this)}/>
                             </CardBody>
