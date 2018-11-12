@@ -29,19 +29,11 @@ class CustomNavbar extends Component {
                 <Collapse isOpen={this.state.isOpen} navbar>
                     <Nav className="ml-auto" navbar>
                         <NavItem>
-                            <NavLink tag={Link} to={"/"}>Home</NavLink>
-                        </NavItem>
-
-                        <NavItem>
-                            <NavLink tag={Link} to={"/marketplace"}>Marketplace</NavLink>
+                            <NavLink tag={Link} to={"/"}>Marketplace</NavLink>
                         </NavItem>
 
                         <NavItem>
                             <NavLink tag={Link} to={"/assets"}>My Assets</NavLink>
-                        </NavItem>
-
-                        <NavItem>
-                            <NavLink  tag={Link} to={"/about"}>About</NavLink>
                         </NavItem>
                     </Nav>
                 </Collapse>
