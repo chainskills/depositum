@@ -262,7 +262,7 @@ class Asset extends Component {
                 const assetId = validAssetIDs[i];
 
                 const item = (
-                    <Col xs={6} md={4} key={assetId} className="vertical-spacing">
+                    <Col xs={6} md={6} key={assetId} className="vertical-spacing">
                         <Card>
                             <ContractDataIPFS contract="AssetContract" method="getHashKey"
                                               methodArgs={assetId}/>
