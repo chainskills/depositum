@@ -16,7 +16,7 @@ contract AssetContract is Ownable {
 
     // description of an asset item
     struct AssetItem {
-        uint id;                // id in the list
+        uint256 id;                // id in the list
         address owner;          // asset's owner
         address candidate;      // candidate owner
         string name;
@@ -27,7 +27,10 @@ contract AssetContract is Ownable {
     }
 
     // List of asset
-    mapping(uint => AssetItem) public assets;
+    mapping(uint256 => AssetItem) public assets;
+
+    // Balance of deposits
+    mapping(uint256 => uint256) public depositsBalance;
 
     // number of assets
     uint256 assetCounter;
@@ -36,11 +39,14 @@ contract AssetContract is Ownable {
     //
     // Events
     //
-    event NewAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
-    event UpdateAsset(uint256 _id, address _owner, string _name, string _description, string _hashKey, uint256 _price);
-    event AssetRemoved(address _owner, uint _id);
-    event SetMarketplace(uint256 _id, address _owner, string _name, string _description, uint256 _price);
-    event UnsetMarketplace(uint256 _id, address _owner, address _candidate, string _name, string _description, uint256 _price);
+    event NewAsset(uint256 _assetId, address _owner, string _name, string _description, string _hashKey, uint256 _price);
+    event UpdateAsset(uint256 _assetId, address _owner, string _name, string _description, string _hashKey, uint256 _price);
+    event AssetRemoved(address _owner, uint _assetId);
+    event SetMarketplace(uint256 _assetId, address _owner, string _name, string _description, uint256 _price);
+    event UnsetMarketplace(uint256 _assetId, address _owner, address _candidate, string _name, string _description, uint256 _price);
+    event Deposit(uint256 _assetId, address _owner, address _candidate, uint256 _price);
+    event Purchase(uint256 _assetId, address _formerOwner, address _newOwner, uint256 _price);
+    event Refund(uint256 _assetId, address _owner, address _candidate, uint256 _price);
 
     //
     // Implementation
@@ -143,6 +149,90 @@ contract AssetContract is Ownable {
         emit UnsetMarketplace(_assetId, msg.sender, asset.candidate, asset.name, asset.description, asset.price);
     }
 
+    // a candidate buyer deposit the price for the purchase
+    // the amount is secured in the contract's balance until the amount is released (sale concluded or refunded)
+    function deposit(uint256 _assetId) public payable {
+        AssetItem storage asset = assets[_assetId];
+
+        // is this asset exists?
+        if (asset.owner == 0x0) {
+            return;
+        }
+
+        // ensure that the asset is not already reserved
+        require(asset.candidate == 0x0, "Asset already reserved to another candidate");
+
+        // ensure that the asset is not already reserved to another candidate buyer
+        require(msg.sender != asset.owner, "Deposit not allowed for the owner of the asset");
+
+        // the value to deposit must be equal to price of the asset
+        require(msg.value == asset.price, "Price are not the same as expected");
+
+        // keep track of the deposit
+        depositsBalance[_assetId] = msg.value;
+
+        // store the address of the purchaser
+        asset.candidate = msg.sender;
+
+        emit Deposit(_assetId, asset.owner, msg.sender, asset.price);
+    }
+
+    // let the candidate buyer to become the new owner of the asset by executing the purchase
+    function purchaseAsset(uint256 _assetId) public payable {
+        AssetItem storage asset = assets[_assetId];
+
+        // is this asset exists?
+        if (asset.owner == 0x0) {
+            return;
+        }
+
+        // ensure that the buyer is the identified candidate
+        require(msg.sender == asset.candidate, "Asset already reserved to another candidate");
+
+        // keep the former owner and the price paid by the purchase
+        address _owner = asset.owner;
+        uint256 _price = depositsBalance[_assetId];
+
+        // move the asset to the buyer and reset its state
+        asset.owner = msg.sender;
+        asset.candidate = 0x0;
+        asset.price = 0;
+        asset.available = false;
+        delete depositsBalance[_assetId];
+
+        // transfer the amount to the former owner
+        _owner.transfer(_price);
+
+        emit Purchase(_assetId, asset.owner, msg.sender, _price);
+    }
+
+    // let the candidate buyer or the asset owner to cancel the purchase and refunding the candidate
+    function refundPurchase(uint256 _assetId) public payable {
+        AssetItem storage asset = assets[_assetId];
+
+        // is this asset exists?
+        if (asset.owner == 0x0) {
+            return;
+        }
+
+        // the sender must be the owner or the candidate
+        if (!(asset.owner == msg.sender) || (asset.candidate == msg.sender)) {
+            require(false, "Refund not authorised for this account");
+        }
+
+        // keep the former owner and the price paid by the purchase
+        address _candidate = asset.candidate;
+        uint256 _price = depositsBalance[_assetId];
+
+        // move the asset to the buyer and reset its state
+        asset.candidate = 0x0;
+        delete depositsBalance[_assetId];
+
+        // transfer the amount to the former owner
+        _candidate.transfer(_price);
+
+        emit Refund(_assetId, asset.owner, msg.sender, _price);
+    }
 
     // remove an asset
     function removeAsset(uint _assetId) public {
