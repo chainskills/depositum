@@ -191,6 +191,34 @@ contract AssetContract is Ownable {
         return myAsset;
     }
 
+    // return asset IDs published in the marketplace
+    function getMarketplace() view public returns (uint[]) {
+        if (assetCounter == 0) {
+            return new uint[](0);
+        }
+
+        // prepare output array
+        uint256[] memory assetIDs = new uint[](assetCounter);
+
+        // iterate over assets
+        uint256 numberOfAssets = 0;
+        for (uint i = 1; i <= assetCounter; i++) {
+            // keep the ID of the asset published in the marketplace
+            if (assets[i].available) {
+                assetIDs[numberOfAssets] = assets[i].id;
+
+                numberOfAssets = numberOfAssets.add(1);
+            }
+        }
+
+        // copy the asset ID array into a smaller array
+        uint256[] memory myAsset = new uint[](numberOfAssets);
+        for (uint j = 0; j < numberOfAssets; j++) {
+            myAsset[j] = assetIDs[j];
+        }
+
+        return myAsset;
+    }
 
     // Retrieve an asset based on its ID
     function getAsset(uint _assetId) view public returns (
@@ -218,6 +246,7 @@ contract AssetContract is Ownable {
             asset.price,
             asset.available);
     }
+
 
 
     function getOwner(uint _assetId) view public returns (address) {

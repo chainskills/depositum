@@ -12,10 +12,10 @@ import ContractDataMarketplace from '../ContractData/ContractDataMarketplace/Con
 
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
-import './Asset.css';
+import './Marketplace.css';
 
 
-class Asset extends Component {
+class Marketplace extends Component {
 
     constructor(props, context) {
         super(props)
@@ -26,7 +26,7 @@ class Asset extends Component {
 
         this.assetContract = context.drizzle.contracts.AssetContract;
 
-        this.validAssetIDsKey = this.assetContract.methods.getMyAssets.cacheCall();
+        this.validAssetIDsKey = this.assetContract.methods.getMarketplace.cacheCall();
 
     }
 
@@ -255,8 +255,8 @@ class Asset extends Component {
 
         let allAssets = [];
 
-        if (this.validAssetIDsKey in this.props.AssetContract.getMyAssets) {
-            const validAssetIDs = this.props.AssetContract.getMyAssets[this.validAssetIDsKey].value;
+        if (this.validAssetIDsKey in this.props.AssetContract.getMarketplace) {
+            const validAssetIDs = this.props.AssetContract.getMarketplace[this.validAssetIDsKey].value;
 
             for (let i = 0; i < validAssetIDs.length; i++) {
                 const assetId = validAssetIDs[i];
@@ -308,8 +308,8 @@ class Asset extends Component {
             <div>
                 <Container>
                     <Jumbotron>
-                        <h2>Your assets on Depositum</h2>
-                        <p>This is the list of your assets that you can keep private to you or to sale in the marketplace</p>
+                        <h2>Depositum Marketplace</h2>
+                        <p>You will find your assets you have published in the marketplace and those put on sale by other individuals</p>
                         <br/>
                         <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>
@@ -362,8 +362,8 @@ class Asset extends Component {
 }
 
 
-Asset.contextTypes = {
+Marketplace.contextTypes = {
     drizzle: PropTypes.object
 };
 
-export default Asset;
+export default Marketplace;
