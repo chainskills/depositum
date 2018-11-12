@@ -12,10 +12,10 @@ import ContractDataMarketplace from '../ContractData/ContractDataMarketplace/Con
 
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
-import './Marketplace.css';
+import './Assets.css';
 
 
-class Marketplace extends Component {
+class Assets extends Component {
 
     constructor(props, context) {
         super(props)
@@ -26,7 +26,7 @@ class Marketplace extends Component {
 
         this.assetContract = context.drizzle.contracts.AssetContract;
 
-        this.validAssetIDsKey = this.assetContract.methods.getMarketplace.cacheCall();
+        this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
 
     }
 
@@ -286,8 +286,9 @@ class Marketplace extends Component {
 
         let allAssets = [];
 
-        if (this.validAssetIDsKey in this.props.AssetContract.getMarketplace) {
-            const validAssetIDs = this.props.AssetContract.getMarketplace[this.validAssetIDsKey].value;
+
+        if (this.validAssetIDsKey in this.props.AssetContract[this.props.fetchMethod]) {
+            const validAssetIDs = this.props.AssetContract[this.props.fetchMethod][this.validAssetIDsKey].value;
 
             for (let i = 0; i < validAssetIDs.length; i++) {
                 const assetId = validAssetIDs[i];
@@ -295,21 +296,21 @@ class Marketplace extends Component {
                 const item = (
                     <Col xs={6} md={6} key={assetId} className="vertical-spacing">
                         <Card>
-                            <ContractDataIPFS contract="AssetContract" method="getHashKey"
+                            <ContractDataIPFS contract={this.assetContract.contractName} method="getHashKey"
                                               methodArgs={assetId}/>
 
                             <CardBody>
                                 <CardTitle>
-                                    <ContractData contract="AssetContract" method="getName"
+                                    <ContractData contract={this.assetContract.contractName} method="getName"
                                                   methodArgs={assetId} hideIndicator/>
                                 </CardTitle>
 
                                 <CardText>
-                                    <ContractDataAmount contract="AssetContract" method="getPrice"
+                                    <ContractDataAmount contract={this.assetContract.contractName} method="getPrice"
                                                         methodArgs={assetId} fromWei="ether" units="ETH"/>
                                 </CardText>
 
-                                <ContractDataMarketplace contract="AssetContract" method="getAsset"
+                                <ContractDataMarketplace contract={this.assetContract.contractName} method="getAsset"
                                                          assetId={assetId}
                                                          account={this.props.accounts[0]}
                                                          actionSet={this.handleSetMarketplace.bind(this)}
@@ -330,9 +331,8 @@ class Marketplace extends Component {
             <div>
                 <Container>
                     <Jumbotron>
-                        <h2>Depositum Marketplace</h2>
-                        <p>You will find your assets you have published in the marketplace and those put on sale by
-                            other individuals</p>
+                        <h2>{this.props.title}</h2>
+                        <p>{this.props.subTitle}</p>
                         <br/>
                         <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>
@@ -385,8 +385,8 @@ class Marketplace extends Component {
 }
 
 
-Marketplace.contextTypes = {
+Assets.contextTypes = {
     drizzle: PropTypes.object
 };
 
-export default Marketplace;
+export default Assets;
