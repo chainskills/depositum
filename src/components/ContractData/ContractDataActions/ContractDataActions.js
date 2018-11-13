@@ -74,7 +74,7 @@ class ContractDataActions extends Component {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-unset-${this.props.assetId}`}
                                      onClick={() => this.props.actionUnset(this.props.assetId)}>To Keep</Button>);
-            } else {
+            } else if (asset._price > 0) {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-set-${this.props.assetId}`}
                                      onClick={() => this.props.actionSet(this.props.assetId)}>To Sell</Button>);
