@@ -178,10 +178,6 @@ class AssetDialog extends Component {
         reader.readAsArrayBuffer(selectedFile)
     }
 
-    handleChange = name => event => {
-        this.setState({[name]: event.target.checked});
-    };
-
     render() {
         if ((typeof this.state.action === "undefined" || this.state.action === "")) {
             // do not render if it's not required
