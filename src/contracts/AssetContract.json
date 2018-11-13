@@ -31481,42 +31481,6 @@
           "type": "event",
           "signature": "0x4efe84f42f5dc8e26465778176a705ad3410cf364c7671cb60cfc8e1f5fe7f3a"
         },
-        "0x3406221f53114f44c9a1bb93d08ee55735f39bf235a54741684a52501207bb54": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "name": "_owner",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "name": "_assetId",
-              "type": "uint256"
-            }
-          ],
-          "name": "AssetRemoved",
-          "type": "event",
-          "signature": "0x3406221f53114f44c9a1bb93d08ee55735f39bf235a54741684a52501207bb54"
-        },
-        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event",
-          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
-        },
         "0x5b06687e2faf130980555e1015a965e09459b7d538a348953f70a14109db3a42": {
           "anonymous": false,
           "inputs": [
@@ -31555,6 +31519,24 @@
           "type": "event",
           "signature": "0x5b06687e2faf130980555e1015a965e09459b7d538a348953f70a14109db3a42"
         },
+        "0x3406221f53114f44c9a1bb93d08ee55735f39bf235a54741684a52501207bb54": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "_owner",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "_assetId",
+              "type": "uint256"
+            }
+          ],
+          "name": "AssetRemoved",
+          "type": "event",
+          "signature": "0x3406221f53114f44c9a1bb93d08ee55735f39bf235a54741684a52501207bb54"
+        },
         "0xe6ed3b6f5d36476600e192b5babbf87c79d5bd296bd4c7f852ed635a34958e40": {
           "anonymous": false,
           "inputs": [
@@ -31592,6 +31574,24 @@
           "name": "Availability",
           "type": "event",
           "signature": "0xe6ed3b6f5d36476600e192b5babbf87c79d5bd296bd4c7f852ed635a34958e40"
+        },
+        "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event",
+          "signature": "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
         },
         "0x5d095dcaf5e2fe5894fd51fdc2e637dd6095cb9b9b3c20d178cecc053a7a8c4e": {
           "anonymous": false,
@@ -31750,10 +31750,10 @@
         }
       },
       "links": {},
-      "address": "0xa2a7DD44f750f556d85e9300ACd2280A4559f069",
+      "address": "0x5520Ab69D280Cc5C4506782537A7BF2dBAEEEE7C",
       "transactionHash": "0x91894847225b10962bb35c367da7c1458ac1a5d2e521ad798dbb8ea92fe3ef62"
     }
   },
   "schemaVersion": "3.0.0-beta.1",
-  "updatedAt": "2018-11-13T11:19:08.399Z"
+  "updatedAt": "2018-11-13T20:39:26.020Z"
 }

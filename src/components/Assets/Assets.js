@@ -20,7 +20,10 @@ class Assets extends Component {
     constructor(props, context) {
         super(props)
 
-        this.state = {};
+        console.log("Into constructor");
+
+        this.state = {
+        };
 
         this.web3 = context.drizzle.web3;
 
@@ -39,20 +42,20 @@ class Assets extends Component {
         }
     }
 
+    componentWillUnmount() {
+        if (this.event != null) {
+            this.event.unsubscribe();
+        }
+    }
+
     listenEvents = () => {
-        //this.web3.eth.clearSubscriptions();
-
-        console.log(this.event);
-
-        this.event = this.assetContract.events.NewAsset({}, (error, event) => {
-            console.log(error, event);
-        })/*
+        this.event = this.assetContract.events.NewAsset({fromBlock:'latest', toBlock:'latest'})
             .on("data", function (event) {
                 console.log(event);
             })
             .on("error", function (error) {
                 console.error(error);
-            })*/;
+            });
     }
 
     handleNew = () => {
