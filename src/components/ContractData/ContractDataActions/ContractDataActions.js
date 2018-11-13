@@ -73,11 +73,11 @@ class ContractDataActions extends Component {
             if (asset._available) {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-unset-${this.props.assetId}`}
-                                     onClick={() => this.props.actionUnset(this.props.assetId)}>Unset</Button>);
+                                     onClick={() => this.props.actionUnset(this.props.assetId)}>To Keep</Button>);
             } else {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-set-${this.props.assetId}`}
-                                     onClick={() => this.props.actionSet(this.props.assetId)}>Set</Button>);
+                                     onClick={() => this.props.actionSet(this.props.assetId)}>To Sell</Button>);
             }
         }
 
@@ -87,7 +87,7 @@ class ContractDataActions extends Component {
 
 ContractDataActions.contextTypes = {
     drizzle: PropTypes.object
-}
+};
 
 /*
  * Export connected component.
@@ -97,6 +97,6 @@ const mapStateToProps = state => {
     return {
         contracts: state.contracts
     }
-}
+};
 
 export default drizzleConnect(ContractDataActions, mapStateToProps);
