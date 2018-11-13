@@ -10,6 +10,7 @@ const mapStateToProps = state => {
         AssetContract: state.contracts.AssetContract,
         drizzleStatus: state.drizzleStatus,
         fetchMethod: "getMarketplace",
+        pageName: "marketplace",
         title: "Depositum Marketplace",
         subTitle: "You will find your assets you have published in the marketplace and those put on sale by other individuals"
     }
