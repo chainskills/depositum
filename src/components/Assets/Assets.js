@@ -20,7 +20,6 @@ class Assets extends Component {
     constructor(props, context) {
         super(props)
 
-        console.log("Into constructor");
 
         this.state = {
         };
@@ -29,16 +28,21 @@ class Assets extends Component {
 
         this.assetContract = context.drizzle.contracts.AssetContract;
 
-        this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
+        this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall({
+            from: this.props.accounts[0]
+        });
 
         // listen for events
         this.listenEvents();
     }
 
     componentDidUpdate(prevProps) {
+
         if (prevProps.accounts[0] !== this.props.accounts[0]) {
             // account has been changed -> reload the list of assets
-            this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
+            this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall({
+                from: this.props.accounts[0]
+            });
         }
     }
 
