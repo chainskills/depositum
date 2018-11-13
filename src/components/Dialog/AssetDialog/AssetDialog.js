@@ -220,7 +220,7 @@ class AssetDialog extends Component {
                                 </Grid>
                                 {this.state.action !== "read" &&
                                 <Grid item>
-                                    <input type='file' onChange={this.loadFile}/>
+                                    <input type='file' onChange={this.loadFile} accept="image/*"/>
                                 </Grid>
                                 }
                             </Grid>
