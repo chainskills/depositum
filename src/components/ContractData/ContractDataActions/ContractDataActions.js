@@ -47,12 +47,12 @@ class ContractDataActions extends Component {
                 // we have already deposit on purchase for this item -> now we can execute the purchase or ask for a refund
 
                 buttons.push(<Button variant="contained" className={'float-right'}
+                                     key={`button-deposit-${this.props.assetId}`}
+                                     onClick={() => this.props.actionPurchase(this.props.assetId)}>Purchase</Button>);
+                buttons.push(<Button variant="contained" className={'float-right card-button'}
                                      key={`button-refund-${this.props.assetId}`}
                                      onClick={() => this.props.actionRefund(this.props.assetId)}>Refund</Button>);
 
-                buttons.push(<Button variant="contained" className={'float-right'}
-                                     key={`button-deposit-${this.props.assetId}`}
-                                     onClick={() => this.props.actionPurchase(this.props.assetId)}>Purchase</Button>);
             } else if (asset._candidate === "0x0000000000000000000000000000000000000000") {
                 // we can set an option on the purchase
                 buttons.push(<Button variant="contained" className={'float-right'}
