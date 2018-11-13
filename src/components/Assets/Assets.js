@@ -28,6 +28,8 @@ class Assets extends Component {
 
         this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
 
+        // listen for events
+        this.listenEvents();
     }
 
     componentDidUpdate(prevProps) {
@@ -35,6 +37,22 @@ class Assets extends Component {
             // account has been changed -> reload the list of assets
             this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
         }
+    }
+
+    listenEvents = () => {
+        //this.web3.eth.clearSubscriptions();
+
+        console.log(this.event);
+
+        this.event = this.assetContract.events.NewAsset({}, (error, event) => {
+            console.log(error, event);
+        })/*
+            .on("data", function (event) {
+                console.log(event);
+            })
+            .on("error", function (error) {
+                console.error(error);
+            })*/;
     }
 
     handleNew = () => {
