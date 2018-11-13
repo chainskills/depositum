@@ -49,7 +49,7 @@ class ContractDataActions extends Component {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-deposit-${this.props.assetId}`}
                                      onClick={() => this.props.actionPurchase(this.props.assetId)}>Purchase</Button>);
-                buttons.push(<Button variant="contained" className={'float-right card-button'}
+                buttons.push(<Button variant="contained" className={'float-right margin-button'}
                                      key={`button-refund-${this.props.assetId}`}
                                      onClick={() => this.props.actionRefund(this.props.assetId)}>Refund</Button>);
 
@@ -63,7 +63,7 @@ class ContractDataActions extends Component {
         } else {
             // we are the asset's owner, we can perform all required actions to manage our asset
 
-            buttons.push(<Button variant="contained" className={'card-button'}
+            buttons.push(<Button variant="contained" className={'margin-button'}
                                  key={`button-remove-${this.props.assetId}`}
                                  onClick={() => this.props.actionRemove(this.props.assetId)}>Remove</Button>);
 

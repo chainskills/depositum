@@ -463,11 +463,18 @@ class Assets extends Component {
                     <Row>
                         <Col xs={12} lg={12}>
                             <div className={"addItem"}>
-                                <Button className={"add-button"} variant="fab" color="primary" aria-label="add"
+                                <Button className={"add-button margin-button"} variant="contained" color="primary"
                                         onClick={() => {
                                             this.handleNew();
                                         }}>
-                                    <AddIcon/>
+                                    Buy Tokens
+                                </Button>
+
+                                <Button className={"add-button"} variant="contained" color="primary"
+                                        onClick={() => {
+                                            this.handleNew();
+                                        }}>
+                                    New Asset
                                 </Button>
                             </div>
                         </Col>
