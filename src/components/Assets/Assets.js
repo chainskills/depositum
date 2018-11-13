@@ -30,6 +30,13 @@ class Assets extends Component {
 
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.accounts[0] !== this.props.accounts[0]) {
+            // account has been changed -> reload the list of assets
+            this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall();
+        }
+    }
+
     handleNew = () => {
         this.setState({
             action: 'new',
