@@ -3,10 +3,12 @@ pragma solidity ^0.4.25;
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
 
-contract AssetContract is Ownable {
+import "./AssetToken.sol";
+
+contract AssetContract is AssetToken {
 
     //
-    // OpenZeppeling specifics
+    // OpenZeppelin specifics
     //
     using SafeMath for uint256;
 
@@ -51,6 +53,12 @@ contract AssetContract is Ownable {
     //
     // Implementation
     //
+
+    constructor(uint256 _rate) public {
+        require(_rate > 0);
+
+        rate = _rate;
+    }
 
     // add a new asset
     function addAsset(string _name, string _description, string _hashKey, uint256 _price) public {
