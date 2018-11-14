@@ -33,7 +33,7 @@ class AssetDialog extends Component {
             description: '',
             imageBuffer: null,
             price: '',
-            imageSource: '/assets/house.png',
+            imageSource: '/images/asset.png',
             newImageSource: ''
         };
 
@@ -52,7 +52,7 @@ class AssetDialog extends Component {
             return;
         }
 
-        let _imageSource = '/assets/house.png';
+        let _imageSource = '/images/asset.png';
         if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
             _imageSource = nextProps.imageSource;
         }
@@ -156,7 +156,7 @@ class AssetDialog extends Component {
             description: '',
             imageBuffer: null,
             price: '',
-            imageSource: '/assets/house.png',
+            imageSource: '/images/asset.png',
             newImageSource: ''
         });
     }
