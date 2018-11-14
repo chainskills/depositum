@@ -10,6 +10,7 @@ import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataA
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
 import TokenDialog from '../Dialog/TokenDialog/TokenDialog';
+import MintDialog from '../Dialog/MintDialog/MintDialog';
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
 
@@ -114,11 +115,19 @@ class Assets extends Component {
     }
 
 
-    handleBuyTokens = () => {
+    hideDialogs = () => {
         this.setState({
-            openTokenDialog: true,
+            openMintDialog: false,
+            openTokenDialog: false,
             openAssetDialog: false,
             openAlertDialog: false
+        });
+    }
+
+    handleBuyTokens = () => {
+        this.hideDialogs();
+        this.setState({
+            openTokenDialog: true
         });
     }
 
@@ -137,16 +146,32 @@ class Assets extends Component {
         });
     }
 
+    handleMintTokens = () => {
+        this.hideDialogs();
+        this.setState({
+            openMintDialog: true
+        });
+    }
+
+    mintTokens = (tokens) => {
+        this.cancelDialog();
+
+        this.assetContract.methods.mint.cacheSend(tokens, {
+            from: this.props.accounts[0],
+            gas: 500000
+        });
+    }
+
+
     handleTransferEarnings = () => {
         let title = `Transfer Earning`;
         let message = `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`;
 
+        this.hideDialogs();
         this.setState({
             dialogTitle: title,
             message: message,
             action: this.transferEarnings.bind(this),
-            openAssetDialog: false,
-            openTokenDialog: false,
             openAlertDialog: true
         });
     }
@@ -161,6 +186,7 @@ class Assets extends Component {
     }
 
     handleNewAsset = () => {
+        this.hideDialogs();
         this.setState({
             action: 'new',
             dialogTitle: 'Create new asset',
@@ -170,9 +196,7 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             price: '',
-            openAssetDialog: true,
-            openTokenDialog: false,
-            openAlertDialog: false
+            openAssetDialog: true
         });
     }
 
@@ -213,6 +237,7 @@ class Assets extends Component {
 
             const price = this.web3.utils.fromWei(asset._price, "ether");
 
+            this.hideDialogs();
             this.setState({
                 action: 'edit',
                 dialogTitle: 'Edit your asset',
@@ -223,9 +248,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog: true,
-                openTokenDialog: false,
-                openAlertDialog: false
+                openAssetDialog: true
             });
 
         }.bind(this));
@@ -243,6 +266,7 @@ class Assets extends Component {
 
             const price = this.web3.utils.fromWei(asset._price, "ether");
 
+            this.hideDialogs();
             this.setState({
                 action: 'read',
                 dialogTitle: 'Details of the asset',
@@ -253,9 +277,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog: true,
-                openTokenDialog: false,
-                openAlertDialog: false
+                openAssetDialog: true
             });
 
         }.bind(this));
@@ -306,13 +328,12 @@ class Assets extends Component {
             let title = `Remove ${asset._name} ?`;
             let message = `Are you sure to remove your asset ${additionalMessage} ?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.removeItem.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -333,13 +354,12 @@ class Assets extends Component {
             const title = `Available in the marketplace`;
             const message = `Are you sure to set your asset available in the marketplace?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.setMarketplace.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -367,13 +387,12 @@ class Assets extends Component {
             const title = `Remove from the marketplace`;
             const message = `Are you sure to remove your asset from the marketplace ${additionalMessage} ?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.unsetMarketplace.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -396,13 +415,12 @@ class Assets extends Component {
             const title = `Set an purchase option`;
             const message = `Are you sure to deposit an option of ${price} ETH for the purchase of this asset?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.deposit.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -428,13 +446,12 @@ class Assets extends Component {
             const title = `Purchase the asset`;
             const message = `Are you sure to purchase the asset by transferring your deposit of ${price} ETH to the owner?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.purchaseAsset.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -457,13 +474,12 @@ class Assets extends Component {
             const title = `Refund`;
             const message = `Are you sure to cancel your purchase and be refunded of your deposit of ${price} ETH?`;
 
+            this.hideDialogs();
             this.setState({
                 dialogTitle: title,
                 message: message,
                 assetId: assetId,
                 action: this.refundPurchase.bind(this),
-                openAssetDialog: false,
-                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -479,6 +495,7 @@ class Assets extends Component {
     }
 
     cancelDialog = () => {
+        this.hideDialogs();
         this.setState({
             action: '',
             dialogTitle: '',
@@ -487,10 +504,7 @@ class Assets extends Component {
             name: '',
             description: '',
             imageSource: '',
-            price: '',
-            openAssetDialog: false,
-            openTokenDialog: false,
-            openAlertDialog: false
+            price: ''
         });
     }
 
@@ -614,6 +628,15 @@ class Assets extends Component {
                                     </Button>
                                 }
 
+                                {this.isContractOwner &&
+                                <Button className={"add-button margin-button"} variant="contained" color="primary"
+                                        onClick={() => {
+                                            this.handleMintTokens();
+                                        }}>
+                                    Mint new tokens
+                                </Button>
+                                }
+
                                 {(this.isContractOwner && (this.earnings > 0)) &&
                                 <Button className={"add-button margin-button"} variant="contained" color="primary"
                                         onClick={() => {
@@ -661,6 +684,14 @@ class Assets extends Component {
                     tokenRate={typeof this.tokenRate !== "undefined" ? this.web3.utils.fromWei(this.web3.utils.toBN(this.tokenRate), "ether") : 0}
                     buyTokens={this.buyTokens.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
+
+                <MintDialog
+                    action={"mint"}
+                    open={this.state.openMintDialog}
+                    dialogTitle={"Mint Depositum tokens"}
+                    mintTokens={this.mintTokens.bind(this)}
+                    cancelDialog={this.cancelDialog.bind(this)}/>
+
 
                 <AlertDialog
                     open={this.state.openAlertDialog}
