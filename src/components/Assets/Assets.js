@@ -22,8 +22,7 @@ class Assets extends Component {
         super(props)
 
 
-        this.state = {
-        };
+        this.state = {};
 
         this.web3 = context.drizzle.web3;
 
@@ -43,6 +42,13 @@ class Assets extends Component {
         // fetch the service cost
         this.serviceFeeKey = this.assetContract.methods["getServiceFee"].cacheCall();
 
+        // fetch if we are the owner of the service
+        this.isOwnerKey = this.assetContract.methods["isContractOwner"].cacheCall({
+            from: this.props.accounts[0]
+        });
+
+        // fetch the balance of earnings
+        this.earningsKey = this.assetContract.methods["getEarnings"].cacheCall();
 
         // listen for events
         this.listenEvents();
@@ -58,6 +64,14 @@ class Assets extends Component {
 
             // fetch the number of tokens
             this.tokensKey = this.assetContract.methods["balanceOf"].cacheCall(this.props.accounts[0]);
+
+            // fetch if we are the owner of the service
+            this.isOwnerKey = this.assetContract.methods["isContractOwner"].cacheCall({
+                from: this.props.accounts[0]
+            });
+
+            // fetch the balance of earnings
+            this.earningsKey = this.assetContract.methods["getEarnings"].cacheCall();
         }
     }
 
@@ -119,6 +133,29 @@ class Assets extends Component {
         this.assetContract.methods.buyTokens.cacheSend({
             from: this.props.accounts[0],
             value: price,
+            gas: 500000
+        });
+    }
+
+    handleTransferEarnings = () => {
+        let title = `Transfer Earning`;
+        let message = `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`;
+
+        this.setState({
+            dialogTitle: title,
+            message: message,
+            action: this.transferEarnings.bind(this),
+            openAssetDialog: false,
+            openTokenDialog: false,
+            openAlertDialog: true
+        });
+    }
+
+    transferEarnings = () => {
+        this.cancelDialog();
+
+        this.assetContract.methods.transferEarnings.cacheSend({
+            from: this.props.accounts[0],
             gas: 500000
         });
     }
@@ -489,6 +526,17 @@ class Assets extends Component {
             this.serviceFee = this.props.AssetContract["getServiceFee"][this.serviceFeeKey].value;
         }
 
+        // check if we are the contract owner the rate
+        this.isContractOwner = false;
+        if(this.isOwnerKey in this.props.AssetContract["isContractOwner"]) {
+            this.isContractOwner = this.props.AssetContract["isContractOwner"][this.isOwnerKey].value;
+        }
+
+        // get earnings
+        this.earnings = 0;
+        if(this.earningsKey in this.props.AssetContract["getEarnings"]) {
+            this.earnings = this.web3.utils.fromWei(this.props.AssetContract["getEarnings"][this.earningsKey].value, "ether");
+        }
 
         if (this.validAssetIDsKey in this.props.AssetContract[this.props.fetchMethod]) {
             const validAssetIDs = this.props.AssetContract[this.props.fetchMethod][this.validAssetIDsKey].value;
@@ -547,6 +595,9 @@ class Assets extends Component {
                         <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>
                         <p>Your balance: {this.balance} ETH</p>
+                        {this.isContractOwner &&
+                        <p>Your earnings: {this.earnings} ETH</p>
+                        }
                         <p>Your tokens: {this.tokens} DPN</p>
                         <p>Service Fee: {this.serviceFee} DPN</p>
                     </Jumbotron>
@@ -561,6 +612,15 @@ class Assets extends Component {
                                             }}>
                                         New Asset
                                     </Button>
+                                }
+
+                                {(this.isContractOwner && (this.earnings > 0)) &&
+                                <Button className={"add-button margin-button"} variant="contained" color="primary"
+                                        onClick={() => {
+                                            this.handleTransferEarnings();
+                                        }}>
+                                    Transfer Earnings
+                                </Button>
                                 }
 
                                 <Button className={"add-button"} variant="contained" color="primary"

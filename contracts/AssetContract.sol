@@ -462,4 +462,13 @@ contract AssetContract is AssetToken {
 
         return asset.available;
     }
+
+    function isContractOwner() view public returns (bool) {
+        // ensure that we have an asset to fetch
+        if (owner() == msg.sender) {
+            return (true);
+        }
+
+        return false;
+    }
 }

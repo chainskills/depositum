@@ -27,13 +27,14 @@ contract AssetToken is Ownable, ERC20Mintable {
     uint public serviceFee;
 
 
-    // balance of tokens sold by contract's owner
-    uint256 balanceSoldTokens;
+    // balance of earning sold by contract's owner
+    uint256 balanceEarnings;
 
 
     //
     // Events
     //
+    event TransferEarnings(address _owner, uint256 _amount);
 
     //
     // Implementation
@@ -72,9 +73,27 @@ contract AssetToken is Ownable, ERC20Mintable {
         _transfer(owner(), msg.sender, _tokens);
 
         // keep amount earned by the contract's owner
-        balanceSoldTokens = balanceSoldTokens.add(msg.value);
+        balanceEarnings = balanceEarnings.add(msg.value);
 
         emit Transfer(owner(), msg.sender, _tokens);
+    }
+
+    // transfer earning to the contract owner
+    function transferEarnings() public onlyOwner {
+
+        if (balanceEarnings == 0) {
+            // nothing to transfer
+            return;
+        }
+
+        // reset the balance
+        uint256 amount = balanceEarnings;
+        balanceEarnings = 0;
+
+        // transfer the amount to the contract's owner
+        owner().transfer(amount);
+
+        emit TransferEarnings(owner(), amount);
     }
 
     // get the rate to buy a token
@@ -88,8 +107,8 @@ contract AssetToken is Ownable, ERC20Mintable {
     }
 
     // get the number of ether earned by the contract's owner
-    function getBalanceOfOwner() public view returns (uint256 _balanceOwner) {
-        return balanceSoldTokens;
+    function getEarnings() public view returns (uint256 _balanceEarnings) {
+        return balanceEarnings;
     }
 
 }
