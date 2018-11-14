@@ -26,7 +26,7 @@ class AssetDialog extends Component {
 
         this.state = {
             action: '',
-            openDialog: false,
+            openAssetDialog: false,
             dialogTitle: '',
             assetId: '',
             name: '',
@@ -47,7 +47,7 @@ class AssetDialog extends Component {
             return;
         }
 
-        if (this.state.openDialog) {
+        if (this.state.openAssetDialog) {
             // do not process this component if it's not required
             return;
         }
@@ -59,7 +59,7 @@ class AssetDialog extends Component {
 
         this.setState({
             action: nextProps.action,
-            openDialog: nextProps.open,
+            openAssetDialog: nextProps.open,
             dialogTitle: nextProps.dialogTitle,
             assetId: nextProps.assetId,
             name: nextProps.name,
@@ -149,7 +149,7 @@ class AssetDialog extends Component {
     resetState = () => {
         this.setState({
             action: '',
-            openDialog: false,
+            openAssetDialog: false,
             dialogTitle: '',
             assetId: '',
             name: '',
@@ -195,7 +195,7 @@ class AssetDialog extends Component {
             <div>
                 <Dialog
                     id={"assetdialog"}
-                    open={(typeof this.state.openDialog === 'undefined') ? false : this.state.openDialog}
+                    open={(typeof this.state.openAssetDialog === 'undefined') ? false : this.state.openAssetDialog}
                     onClose={this.handleClose}
                     aria-labelledby="assetdialog-title"
                     disableBackdropClick={true}
@@ -272,6 +272,7 @@ class AssetDialog extends Component {
                                             input: classes.textSettings,
                                         },
                                         step: 0.01,
+                                        min: 0,
                                         readOnly: this.state.action === "read" ? true : false
                                     }}
                                 />
@@ -320,7 +321,6 @@ class AssetDialog extends Component {
                                 color={"secondary"}
                                 onClick={() => {
                                     this.handleClose();
-                                    this.props.cancelDialog();
                                 }}>Cancel</Button>
                             <Button
                                 label="Save"

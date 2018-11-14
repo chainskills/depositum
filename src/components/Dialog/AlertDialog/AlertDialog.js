@@ -12,7 +12,7 @@ class AlertDialog extends Component {
         super()
 
         this.state = {
-            openDialog: false,
+            openAssetDialog: false,
             dialogTitle: '',
             message: '',
             asset: null
@@ -23,7 +23,7 @@ class AlertDialog extends Component {
     UNSAFE_componentWillReceiveProps(nextProps) {
         this.setState({
             dialogTitle: nextProps.dialogTitle,
-            openDialog: nextProps.open,
+            openAssetDialog: nextProps.open,
             message: nextProps.message,
             assetId: nextProps.assetId
         });
@@ -32,7 +32,7 @@ class AlertDialog extends Component {
 
     // closes all modals
     handleClose = () => {
-        this.setState({openDialog: false});
+        this.setState({openAssetDialog: false});
     }
 
     render() {
@@ -40,7 +40,7 @@ class AlertDialog extends Component {
             <div>
                 <Dialog
                     id={"alertdialog"}
-                    open={(typeof this.state.openDialog === 'undefined') ? false : this.state.openDialog}
+                    open={(typeof this.state.openAssetDialog === 'undefined') ? false : this.state.openAssetDialog}
                     onClose={this.handleClose}
                     aria-labelledby="alertdialog-title"
                     disableBackdropClick={true}

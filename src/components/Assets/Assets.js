@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Jumbotron, Card, CardBody, CardText, CardTitle, Col, Container, Row} from 'reactstrap';
 import Button from '@material-ui/core/Button';
-import AddIcon from "@material-ui/icons/Add";
 import {ContractData} from 'drizzle-react-components'
 
 import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
@@ -10,8 +9,10 @@ import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS'
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
+import TokenDialog from '../Dialog/TokenDialog/TokenDialog';
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
+
 import './Assets.css';
 
 
@@ -28,9 +29,17 @@ class Assets extends Component {
 
         this.assetContract = context.drizzle.contracts.AssetContract;
 
+        // fetch the list if asset IDs
         this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall({
             from: this.props.accounts[0]
         });
+
+        // fetch the rate to buy tokens
+        this.rateKey = this.assetContract.methods["getRate"].cacheCall();
+
+        // fetch the number of tokens
+        this.tokensKey = this.assetContract.methods["getTokens"].cacheCall();
+
 
         // listen for events
         this.listenEvents();
@@ -62,7 +71,31 @@ class Assets extends Component {
             });
     }
 
-    handleNew = () => {
+
+    handleBuyTokens = () => {
+        this.setState({
+            openTokenDialog: true,
+            openAssetDialog: false,
+            openAlertDialog: false
+        });
+    }
+
+    buyTokens = (tokens) => {
+        this.cancelDialog();
+
+        const price = tokens * this.tokenRate;
+        if (price === 0) {
+            return;
+        }
+
+        this.assetContract.methods.buyTokens.cacheSend({
+            from: this.props.accounts[0],
+            value: price,
+            gas: 500000
+        });
+    }
+
+    handleNewAsset = () => {
         this.setState({
             action: 'new',
             dialogTitle: 'Create new asset',
@@ -72,7 +105,8 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             price: '',
-            openDialog: true,
+            openAssetDialog: true,
+            openTokenDialog: false,
             openAlertDialog: false
         });
     }
@@ -124,7 +158,8 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openDialog: true,
+                openAssetDialog: true,
+                openTokenDialog: false,
                 openAlertDialog: false
             });
 
@@ -153,7 +188,8 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openDialog: true,
+                openAssetDialog: true,
+                openTokenDialog: false,
                 openAlertDialog: false
             });
 
@@ -210,7 +246,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.removeItem.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -236,7 +273,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.setMarketplace.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -269,7 +307,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.unsetMarketplace.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -297,7 +336,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.deposit.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -328,7 +368,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.purchaseAsset.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -356,7 +397,8 @@ class Assets extends Component {
                 message: message,
                 assetId: assetId,
                 action: this.refundPurchase.bind(this),
-                openDialog: false,
+                openAssetDialog: false,
+                openTokenDialog: false,
                 openAlertDialog: true
             });
         }.bind(this));
@@ -381,7 +423,8 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             price: '',
-            openDialog: false,
+            openAssetDialog: false,
+            openTokenDialog: false,
             openAlertDialog: false
         });
     }
@@ -399,6 +442,19 @@ class Assets extends Component {
         }.bind(this));
 
         let allAssets = [];
+
+
+        // get the rate
+        this.tokenRate = 0;
+        if(this.rateKey in this.props.AssetContract["getRate"]) {
+            this.tokenRate = this.props.AssetContract["getRate"][this.rateKey].value;
+        }
+
+        // get the number of tokens
+        this.tokens = 0;
+        if(this.tokensKey in this.props.AssetContract["getTokens"]) {
+            this.tokens = this.props.AssetContract["getTokens"][this.tokensKey].value;
+        }
 
 
         if (this.validAssetIDsKey in this.props.AssetContract[this.props.fetchMethod]) {
@@ -458,6 +514,7 @@ class Assets extends Component {
                         <p>Your are connected on the network: {this.networkType}</p>
                         <p>Your account: {this.props.accounts[0]}</p>
                         <p>Your balance: {this.balance} ETH</p>
+                        <p>Your tokens: {this.tokens} DPN</p>
                     </Jumbotron>
 
                     <Row>
@@ -465,14 +522,14 @@ class Assets extends Component {
                             <div className={"addItem"}>
                                 <Button className={"add-button margin-button"} variant="contained" color="primary"
                                         onClick={() => {
-                                            this.handleNew();
+                                            this.handleBuyTokens();
                                         }}>
                                     Buy Tokens
                                 </Button>
 
                                 <Button className={"add-button"} variant="contained" color="primary"
                                         onClick={() => {
-                                            this.handleNew();
+                                            this.handleNewAsset();
                                         }}>
                                     New Asset
                                 </Button>
@@ -488,7 +545,7 @@ class Assets extends Component {
 
                 <AssetDialog
                     action={this.state.action}
-                    open={this.state.openDialog}
+                    open={this.state.openAssetDialog}
                     dialogTitle={this.state.dialogTitle}
                     assetId={this.state.assetId}
                     owner={this.state.owner}
@@ -498,6 +555,14 @@ class Assets extends Component {
                     price={this.state.price}
                     addAsset={this.addAsset.bind(this)}
                     updateAsset={this.updateAsset.bind(this)}
+                    cancelDialog={this.cancelDialog.bind(this)}/>
+
+                <TokenDialog
+                    action={"buy"}
+                    open={this.state.openTokenDialog}
+                    dialogTitle={"Buy Depositum tokens"}
+                    tokenRate={typeof this.tokenRate !== "undefined" ? this.web3.utils.fromWei(this.web3.utils.toBN(this.tokenRate), "ether") : 0}
+                    buyTokens={this.buyTokens.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
                 <AlertDialog
