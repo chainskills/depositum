@@ -162,22 +162,7 @@ contract AssetContract is AssetToken {
 
         if (asset.candidate != 0x0) {
             // we need to refund by sending back the deposit to the candidate
-
-            // keep the former owner and the price paid by the purchase
-            address _candidate = asset.candidate;
-            uint256 _price = depositsBalance[_assetId];
-
-            // move the asset to the buyer and reset its state
-            asset.candidate = 0x0;
-            delete depositsBalance[_assetId];
-
-            if (_price > 0) {
-                // transfer the amount to the former owner
-                _candidate.transfer(_price);
-
-            }
-
-            emit Refund(_assetId, asset.owner, msg.sender, _price);
+            _refund(asset, _assetId);
         } else {
             emit UnsetMarketplace(_assetId, msg.sender, asset.candidate, asset.name, asset.description, asset.price);
 
@@ -254,27 +239,15 @@ contract AssetContract is AssetToken {
 
         // the sender must be the owner or the candidate
         if ((msg.sender == asset.owner) || (msg.sender == asset.candidate)) {
-            // keep the former owner and the price paid by the purchase
-            address _candidate = asset.candidate;
-            uint256 _price = depositsBalance[_assetId];
-
-            // move the asset to the buyer and reset its state
-            asset.candidate = 0x0;
-            delete depositsBalance[_assetId];
-
-            if (_price > 0) {
-                // transfer back the amount to the candidate
-                _candidate.transfer(_price);
-            }
-
-            emit Refund(_assetId, asset.owner, msg.sender, _price);
+            // we need to refund by sending back the deposit to the candidate
+            _refund(asset, _assetId);
         } else {
             require(false, "Refund not authorised for this account");
         }
     }
 
-    // remove an asset
-    function removeAsset(uint _assetId) public {
+    // remove the asset and refund the potiential candidate
+    function removeAsset(uint256 _assetId) public {
         AssetItem storage asset = assets[_assetId];
 
         // is this asset exists?
@@ -284,6 +257,11 @@ contract AssetContract is AssetToken {
 
         // only the asset's owner is allowed to remove this asset
         require(msg.sender == asset.owner, "Action allowed only to the owner");
+
+        if (asset.candidate != 0x0) {
+            // we need to refund by sending back the deposit to the candidate
+            _refund(asset, _assetId);
+        }
 
         // remove the asset
         delete assets[_assetId];
@@ -318,6 +296,29 @@ contract AssetContract is AssetToken {
         }
 
         return myAsset;
+    }
+
+    // execute the refund
+    function _refund(AssetItem storage _asset, uint256 _assetId) internal {
+
+        if (_asset.candidate == 0x0) {
+            return;
+        }
+
+        // keep the former owner and the price paid by the purchase
+        address _candidate = _asset.candidate;
+        uint256 _price = depositsBalance[_assetId];
+
+        // move the asset to the buyer and reset its state
+        _asset.candidate = 0x0;
+        delete depositsBalance[_assetId];
+
+        if (_price > 0) {
+            // transfer back the amount to the candidate
+            _candidate.transfer(_price);
+        }
+
+        emit Refund(_assetId, _asset.owner, msg.sender, _price);
     }
 
     // return asset IDs published in the marketplace

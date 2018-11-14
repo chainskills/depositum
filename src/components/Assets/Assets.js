@@ -599,6 +599,8 @@ class Assets extends Component {
             }
         }
 
+        console.log("aaaa");
+
         return (
             <div>
                 <Container>
@@ -619,7 +621,7 @@ class Assets extends Component {
                     <Row>
                         <Col xs={12} lg={12}>
                             <div className={"addItem"}>
-                                {this.tokens >= this.serviceFee &&
+                                {Number(this.tokens) >= Number(this.serviceFee) &&
                                     <Button className={"add-button margin-button"} variant="contained" color="primary"
                                             onClick={() => {
                                                 this.handleNewAsset();
