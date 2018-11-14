@@ -171,10 +171,11 @@ contract AssetContract is AssetToken {
             asset.candidate = 0x0;
             delete depositsBalance[_assetId];
 
-            // TODO: if the price is equal to zero, avoid the call to transfer
+            if (_price > 0) {
+                // transfer the amount to the former owner
+                _candidate.transfer(_price);
 
-            // transfer the amount to the former owner
-            _candidate.transfer(_price);
+            }
 
             emit Refund(_assetId, asset.owner, msg.sender, _price);
         } else {
@@ -234,8 +235,10 @@ contract AssetContract is AssetToken {
         asset.available = false;
         delete depositsBalance[_assetId];
 
-        // transfer the amount to the former owner
-        _owner.transfer(_price);
+        if (_price != 0) {
+            // transfer the amount to the former owner
+            _owner.transfer(_price);
+        }
 
         emit Purchase(_assetId, asset.owner, msg.sender, _price);
     }
@@ -259,7 +262,7 @@ contract AssetContract is AssetToken {
             asset.candidate = 0x0;
             delete depositsBalance[_assetId];
 
-            if (_price != 0) {
+            if (_price > 0) {
                 // transfer back the amount to the candidate
                 _candidate.transfer(_price);
             }
