@@ -6,21 +6,47 @@ contract("AssetContract", async (accounts) => {
     const rate = 3000000000000000;
     const initialToken = 10000;
     const serviceFee = 2;
+    const name = "My kitten";
+    const description = "My personal and unique kitten";
+    const ipfsHashKey = "QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdsgaTQ";
+    const price = 10000000000000000000;
+
 
     before('setup contract for each test', async () => {
         contractInstance = await AssetContract.deployed(rate, initialToken, serviceFee);
     })
+
 
     it("should be initialized with empty values", async () => {
         const _rate = await contractInstance.getRate()
         assert.equal(web3.utils.toBN(_rate), rate, "The rate should be " + rate);
 
         const _initialToken = await contractInstance.balanceOf(accounts[0])
-        assert.equal(web3.utils.toBN(_initialToken), initialToken, "The initial token should be " + initialToken);
+        assert.equal(web3.utils.toBN(_initialToken), initialToken, "The initial token minted should be " + initialToken);
 
         const _serviceFee = await contractInstance.getServiceFee()
         assert.equal(web3.utils.toBN(_serviceFee), serviceFee, "The service fee should be " + serviceFee);
+
+        const balance = await web3.eth.getBalance(contractInstance.address);
+        assert.equal(web3.utils.toBN(balance), 0, "The balance of the contract should be 0");
     })
+
+
+    it("should let us mint 10 tokens", async () => {
+        const balanceBeforeMint = await web3.eth.getBalance(contractInstance.address);
+        assert.equal(web3.utils.toBN(balanceBeforeMint), 0, "The balance of the contract should be 0");
+
+        await contractInstance.mint(10, {from: accounts[1]});
+
+        const _tokens = await contractInstance.balanceOf(accounts[1])
+        assert.equal(web3.utils.toBN(_tokens), 10, "The number of tokens minted should be " + 10);
+
+        const balance = 10 * rate;
+        const balanceAfterMint = await web3.eth.getBalance(contractInstance.address);
+        assert.equal(web3.utils.toBN(balanceAfterMint), balance, "The balance of the contract should be " + balance);
+
+    })
+
 
 
     /*
