@@ -49,7 +49,7 @@ out/
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 .idea/compiler.xml
-.idea/chainbnb.iml
+.idea/depositum.iml
 .idea/inspectionProfiles/
 .idea/misc.xml
 .idea/modules.xml
