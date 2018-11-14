@@ -23,6 +23,10 @@ contract AssetToken is Ownable, ERC20Mintable {
     // rate for a token
     uint256 public rate;
 
+    // service fee to use the add a new asset (in token)
+    uint public serviceFee;
+
+
     // balance of tokens sold by contract's owner
     uint256 balanceSoldTokens;
 
@@ -41,6 +45,13 @@ contract AssetToken is Ownable, ERC20Mintable {
         require(_newRate > 0, "The rate must be greater than 0");
         rate = _newRate;
     }
+
+    // set the cost for a service
+    function setServiceFee(uint _serviceFee) public onlyOwner {
+        require(_serviceFee > 0, "The service fee must be greater than 0");
+        serviceFee = _serviceFee;
+    }
+
 
     // mint additional tokens
     function mint(uint256 _tokens) public onlyOwner {
@@ -69,6 +80,11 @@ contract AssetToken is Ownable, ERC20Mintable {
     // get the rate to buy a token
     function getRate() public view returns (uint256 _rate) {
         return rate;
+    }
+
+    // get the service fee
+    function getServiceFee() public view returns (uint256 _serviceFee) {
+        return serviceFee;
     }
 
     // get the number of ether earned by the contract's owner

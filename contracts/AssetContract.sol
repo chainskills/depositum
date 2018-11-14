@@ -51,12 +51,15 @@ contract AssetContract is AssetToken {
     // Implementation
     //
 
-    constructor(uint256 _rate, uint256 _tokens) public {
+    constructor(uint256 _rate, uint256 _tokens, uint _serviceFee) public {
         require(_rate > 0);
         require(_tokens >= 100);
 
         // set initial rate
         rate = _rate;
+
+        // set the service fee in token to use the service
+        serviceFee = _serviceFee;
 
         // mint initial tokens
         mint(msg.sender, _tokens);
@@ -75,6 +78,9 @@ contract AssetContract is AssetToken {
         // an IPFS hash key is required
         bytes memory hashKey = bytes(_hashKey);
         require(hashKey.length > 0, "A hash key from IPFS is required");
+
+        // pay the service service
+        _burn(msg.sender, serviceFee);
 
         // new asset
         assetCounter = assetCounter.add(1);

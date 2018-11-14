@@ -40,6 +40,9 @@ class Assets extends Component {
         // fetch the number of tokens
         this.tokensKey = this.assetContract.methods["balanceOf"].cacheCall(this.props.accounts[0]);
 
+        // fetch the service cost
+        this.serviceFeeKey = this.assetContract.methods["getServiceFee"].cacheCall();
+
 
         // listen for events
         this.listenEvents();
@@ -468,7 +471,6 @@ class Assets extends Component {
 
         let allAssets = [];
 
-
         // get the rate
         this.tokenRate = 0;
         if(this.rateKey in this.props.AssetContract["getRate"]) {
@@ -479,6 +481,12 @@ class Assets extends Component {
         this.tokens = 0;
         if(this.tokensKey in this.props.AssetContract["balanceOf"]) {
             this.tokens = this.props.AssetContract["balanceOf"][this.tokensKey].value;
+        }
+
+        // get the rate
+        this.serviceFee = 0;
+        if(this.serviceFeeKey in this.props.AssetContract["getServiceFee"]) {
+            this.serviceFee = this.props.AssetContract["getServiceFee"][this.serviceFeeKey].value;
         }
 
 
@@ -540,6 +548,7 @@ class Assets extends Component {
                         <p>Your account: {this.props.accounts[0]}</p>
                         <p>Your balance: {this.balance} ETH</p>
                         <p>Your tokens: {this.tokens} DPN</p>
+                        <p>Service Fee: {this.serviceFee} DPN</p>
                     </Jumbotron>
 
                     <Row>
