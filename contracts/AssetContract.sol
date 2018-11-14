@@ -1,8 +1,5 @@
 pragma solidity ^0.4.25;
 
-import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
-
 import "./AssetToken.sol";
 
 contract AssetContract is AssetToken {
@@ -54,10 +51,15 @@ contract AssetContract is AssetToken {
     // Implementation
     //
 
-    constructor(uint256 _rate) public {
+    constructor(uint256 _rate, uint256 _tokens) public {
         require(_rate > 0);
+        require(_tokens >= 100);
 
+        // set initial rate
         rate = _rate;
+
+        // mint initial tokens
+        mint(msg.sender, _tokens);
     }
 
     // add a new asset

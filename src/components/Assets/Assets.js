@@ -38,7 +38,7 @@ class Assets extends Component {
         this.rateKey = this.assetContract.methods["getRate"].cacheCall();
 
         // fetch the number of tokens
-        this.tokensKey = this.assetContract.methods["getTokens"].cacheCall();
+        this.tokensKey = this.assetContract.methods["balanceOf"].cacheCall(this.props.accounts[0]);
 
 
         // listen for events
@@ -52,17 +52,42 @@ class Assets extends Component {
             this.validAssetIDsKey = this.assetContract.methods[this.props.fetchMethod].cacheCall({
                 from: this.props.accounts[0]
             });
+
+            // fetch the number of tokens
+            this.tokensKey = this.assetContract.methods["balanceOf"].cacheCall(this.props.accounts[0]);
         }
     }
 
     componentWillUnmount() {
         if (this.event != null) {
             this.event.unsubscribe();
+         }
+        if (this.event2 != null) {
+            this.event2.unsubscribe();
         }
+        if (this.event3 != null) {
+            this.event3.unsubscribe();
+        }
+
     }
 
     listenEvents = () => {
         this.event = this.assetContract.events.NewAsset({fromBlock:'latest', toBlock:'latest'})
+            .on("data", function (event) {
+                console.log(event);
+            })
+            .on("error", function (error) {
+                console.error(error);
+            });
+
+        this.event2 = this.assetContract.events.Transfer({fromBlock:'latest', toBlock:'latest'})
+            .on("data", function (event) {
+                console.log(event);
+            })
+            .on("error", function (error) {
+                console.error(error);
+            });
+        this.event3 = this.assetContract.events.Approval({fromBlock:'latest', toBlock:'latest'})
             .on("data", function (event) {
                 console.log(event);
             })
@@ -452,8 +477,8 @@ class Assets extends Component {
 
         // get the number of tokens
         this.tokens = 0;
-        if(this.tokensKey in this.props.AssetContract["getTokens"]) {
-            this.tokens = this.props.AssetContract["getTokens"][this.tokensKey].value;
+        if(this.tokensKey in this.props.AssetContract["balanceOf"]) {
+            this.tokens = this.props.AssetContract["balanceOf"][this.tokensKey].value;
         }
 
 

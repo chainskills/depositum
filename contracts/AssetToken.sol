@@ -1,14 +1,20 @@
 pragma solidity ^0.4.25;
 
 import 'openzeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'openzeppelin-solidity/contracts/math/SafeMath.sol';
+import 'openzeppelin-solidity/contracts/token/ERC20/ERC20Mintable.sol';
 
-contract AssetToken is Ownable {
+contract AssetToken is Ownable, ERC20Mintable {
 
     //
     // OpenZeppelin specifics
     //
     using SafeMath for uint256;
+
+
+    // Token identity
+    string public constant name = 'Depositum';
+    string public constant symbol = 'DPM';
+    uint8 public constant decimals = 1;
 
     //
     // state variables
@@ -16,9 +22,6 @@ contract AssetToken is Ownable {
 
     // rate for a token
     uint256 public rate;
-
-    // balance of tokens
-    mapping(address => uint256) balances;
 
     // balance of tokens sold by contract's owner
     uint256 balanceSoldTokens;
@@ -39,6 +42,11 @@ contract AssetToken is Ownable {
         rate = _newRate;
     }
 
+    // mint additional tokens
+    function mint(uint256 _tokens) public onlyOwner {
+        mint(msg.sender, _tokens);
+    }
+
     // purchase tokens
     function buyTokens() public payable {
         require(rate > 0, "The rate must be greater than 0");
@@ -46,11 +54,16 @@ contract AssetToken is Ownable {
         uint256 weiAmount = msg.value;
         uint256 _tokens = weiAmount.div(rate);
 
-        // store tokens owned by the account
-        balances[msg.sender] = balances[msg.sender].add(_tokens);
+        // enough token?
+        require(balanceOf(owner()) >= _tokens, "Not enough tokens");
+
+        // transfer to the account
+        _transfer(owner(), msg.sender, _tokens);
 
         // keep amount earned by the contract's owner
         balanceSoldTokens = balanceSoldTokens.add(msg.value);
+
+        emit Transfer(owner(), msg.sender, _tokens);
     }
 
     // get the rate to buy a token
@@ -58,16 +71,9 @@ contract AssetToken is Ownable {
         return rate;
     }
 
-    // get the number of tokens owned by the account
-    function getTokens() public view returns (uint256 _tokens) {
-        return balances[msg.sender];
-    }
-
     // get the number of ether earned by the contract's owner
-    function getBalanceOfOwner() public view returns (uint256 _balance) {
+    function getBalanceOfOwner() public view returns (uint256 _balanceOwner) {
         return balanceSoldTokens;
     }
-
-
 
 }

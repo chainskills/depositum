@@ -12,7 +12,7 @@ const drizzleOptions = {
         AssetContract
     ],
     events: {
-        AssetContract: ['NewAsset', 'AssetRemoved']
+        AssetContract: ['NewAsset', 'AssetRemoved', 'Transfer', 'Approval']
     },
     polls: {
         accounts: 1500
