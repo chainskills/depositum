@@ -17,6 +17,9 @@ const styles = theme => ({
     },
     formControl: {
         marginTop: theme.spacing.unit * 3,
+    },
+    inputFile: {
+        display: 'none'
     }
 });
 
@@ -209,14 +212,21 @@ class AssetDialog extends Component {
                     <DialogContent>
 
                         <Grid container>
-                            <Grid item xs={4} container direction="column" spacing={16}>
+                            <Grid item xs={4} container direction="column" spacing={16} alignItems="center" justify="center">
                                 <Grid item>
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${imageSourceNew}`}/>
                                 </Grid>
                                 {this.state.action !== "read" &&
                                 <Grid item>
-                                    <input type='file' onChange={this.loadFile} accept="image/*"/>
+                                    <input type='file' className={classes.inputFile} onChange={this.loadFile} accept="image/*" ref={'file-upload'} />
+                                    <Button
+                                        label="Upload"
+                                        variant="outlined"
+                                        color={"primary"}
+                                        onClick={e => {
+                                            this.refs['file-upload'].click()
+                                        }}>Add a picture ...</Button>
                                 </Grid>
                                 }
                             </Grid>
