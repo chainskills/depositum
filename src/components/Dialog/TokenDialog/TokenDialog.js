@@ -47,9 +47,7 @@ class TokenDialog extends Component {
     }
 
 
-
     render() {
-        console.log("render->dialog");
         if ((typeof this.props.type === "undefined") || (this.props.type === "")) {
             // do not process this component if it's not required
             return null;

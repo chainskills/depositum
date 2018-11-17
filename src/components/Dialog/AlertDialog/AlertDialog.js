@@ -8,45 +8,47 @@ import Button from '@material-ui/core/Button';
 
 
 class AlertDialog extends Component {
-    constructor() {
-        super()
+    constructor(props, context) {
+        super(props)
 
         this.state = {
-            openAssetDialog: false,
-            dialogTitle: '',
+            open: false,
+            title: '',
             message: '',
             asset: null
         }
         this.handleClose = this.handleClose.bind(this);
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        this.setState({
-            dialogTitle: nextProps.dialogTitle,
-            openAssetDialog: nextProps.open,
-            message: nextProps.message,
-            assetId: nextProps.assetId
-        });
+    componentDidUpdate(prevProps) {
+        if (prevProps.type === this.props.type) {
+            // component already opened
+            return;
+        }
     }
-
 
     // closes all modals
     handleClose = () => {
-        this.setState({openAssetDialog: false});
+        this.props.cancel();
     }
 
     render() {
+        if ((typeof this.props.open === "undefined") || (this.props.open === false)) {
+            // do not process this component if it's not required
+            return null;
+        }
+
         return (
             <div>
                 <Dialog
                     id={"alertdialog"}
-                    open={(typeof this.state.openAssetDialog === 'undefined') ? false : this.state.openAssetDialog}
+                    open={(typeof this.props.open === 'undefined') ? false : this.props.open}
                     onClose={this.handleClose}
                     aria-labelledby="alertdialog-title"
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}>
 
-                    <DialogTitle id="alertdialog-title">{this.state.dialogTitle}</DialogTitle>
+                    <DialogTitle id="alertdialog-title">{this.props.title}</DialogTitle>
 
                     <DialogContent>
                         <DialogContentText>
@@ -59,8 +61,7 @@ class AlertDialog extends Component {
                             color="primary"
                             focusRipple={true}
                             onClick={() => {
-                                this.handleClose();
-                                this.props.cancelDialog();}}>
+                                this.handleClose();}}>
                             No
                         </Button>
                         <Button

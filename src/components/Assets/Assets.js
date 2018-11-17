@@ -148,7 +148,7 @@ class Assets extends Component {
         this.setState({
             type: "transfer",
             openTokenDialog: true,
-            title: "Mint new Depositum tokens",
+            title: "Transfer your earnings",
             message: `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`
         });
     }
@@ -653,7 +653,7 @@ class Assets extends Component {
                     type={this.state.type}
                     open={this.state.openTokenDialog}
                     title={this.state.title}
-                    message={this.props.message}
+                    message={this.state.message}
                     account={this.props.accounts[0]}
                     web3={this.web3}
                     contract={this.assetContract}

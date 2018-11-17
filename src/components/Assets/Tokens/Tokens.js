@@ -69,7 +69,7 @@ class Tokens extends Component {
 
         return (
             <div>
-                {this.props.type === "buy" &&
+                {this.props.type !== "transfer" &&
                 <TokenDialog
                     open={this.props.open}
                     type={this.props.type}
@@ -84,7 +84,7 @@ class Tokens extends Component {
                     open={this.props.open}
                     title={this.props.title}
                     message={this.props.message}
-                    action={this.transferEarnings().bind(this)}
+                    action={this.transferEarnings.bind(this)}
                     cancel={this.hideDialogs.bind(this)}/>
                 }
             </div>
