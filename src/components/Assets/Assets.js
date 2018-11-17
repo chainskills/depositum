@@ -124,6 +124,10 @@ class Assets extends Component {
         });
     }
 
+    //
+    // Manage tokens
+    //
+
     handleBuyTokens = () => {
         console.log("aaa");
         this.hideDialogs();
@@ -154,6 +158,10 @@ class Assets extends Component {
             message: `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`
         });
     }
+
+    //
+    // Manage assets
+    //
 
     handleNewAsset = () => {
         this.hideDialogs();
@@ -213,8 +221,8 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                action: 'read',
-                dialogTitle: 'Details of the asset',
+                type: 'read',
+                title: 'Detail of the asset',
                 assetId: assetId,
                 owner: asset._owner,
                 name: asset._name,
@@ -222,43 +230,11 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog: true
+                openAssetDialog2: true
             });
 
         }.bind(this));
     }
-
-    updateAsset = (asset) => {
-        this.cancelDialog();
-
-        let price = asset.price;
-        if (price !== '') {
-            price = this.web3.utils.toWei(price, "ether");
-        }
-
-        if (asset.imageBuffer != null) {
-            // save the document to IPFS
-            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
-                if (error) {
-                    console.error(error)
-                    return
-                }
-
-                this.assetContract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, {
-                    from: this.props.accounts[0],
-                    gas: 500000
-                });
-
-            });
-        } else {
-            // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
-            this.assetContract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.state.ipfsHashKey, price, {
-                from: this.props.accounts[0],
-                gas: 500000
-            });
-        }
-    }
-
 
     handleRemove = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
@@ -275,23 +251,15 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'remove',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.removeItem.bind(this),
-                openAlertDialog: true
+                openAssetDialog2: true
             });
         }.bind(this));
     }
 
-    removeItem = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.removeAsset.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
-    }
 
     handleSetMarketplace = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
@@ -627,19 +595,6 @@ class Assets extends Component {
                     ipfsHashKey={this.state.ipfsHashKey}
                     price={this.state.price}
                     cancel={this.cancelDialog.bind(this)}/>
-
-                <AssetDialog
-                    action={this.state.action}
-                    open={this.state.openAssetDialog}
-                    dialogTitle={this.state.dialogTitle}
-                    assetId={this.state.assetId}
-                    owner={this.state.owner}
-                    name={this.state.name}
-                    description={this.state.description}
-                    imageSource={this.state.imageSource}
-                    price={this.state.price}
-                    updateAsset={this.updateAsset.bind(this)}
-                    cancelDialog={this.cancelDialog.bind(this)}/>
 
                 <Token
                     type={this.state.type}

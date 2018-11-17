@@ -59,7 +59,7 @@ class AssetDialog extends Component {
             name: nextProps.name,
             description: nextProps.description,
             price: nextProps.price,
-            imageSource: nextProps.imageSource
+            imageSource: nextProps.imageSource !== "" ? nextProps.imageSource : '/images/asset.png'
         });
     }
 
@@ -127,18 +127,7 @@ class AssetDialog extends Component {
 
     // reset the component
     resetState = () => {
-        this.setState({
-            type: '',
-            open: false,
-            title: '',
-            assetId: '',
-            name: '',
-            description: '',
-            imageBuffer: null,
-            price: '',
-            imageSource: '/images/asset.png',
-            newImageSource: ''
-        });
+        this.setState({});
     }
 
     loadFile = (event) => {

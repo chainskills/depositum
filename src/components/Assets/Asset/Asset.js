@@ -74,7 +74,17 @@ class Asset extends Component {
             });
         }
     }
-    
+
+    removeItem = (assetId) => {
+        this.hideDialogs();
+
+        this.props.contract.methods.removeAsset.cacheSend(assetId, {
+            from: this.props.account,
+            gas: 500000
+        });
+    }
+
+
     componentDidUpdate(prevProps) {
         if (prevProps.open !== this.props.open) {
             this.setState({
@@ -93,6 +103,7 @@ class Asset extends Component {
 
         return (
             <div>
+                {this.props.type !== "remove" &&
                 <AssetDialog
                     type={this.props.type}
                     open={this.props.open}
@@ -106,14 +117,16 @@ class Asset extends Component {
                     readOnly={this.props.type === "read" ? true : false}
                     action={this.props.type === "new" ? this.addAsset.bind(this) : this.updateAsset.bind(this)}
                     cancel={this.hideDialogs.bind(this)}/>
+                }
 
 
-                {this.props.type === "transfer" &&
+                {this.props.type === "remove" &&
                 <AlertDialog
                     open={this.props.open}
                     title={this.props.title}
+                    assetId={this.props.assetId}
                     message={this.props.message}
-                    action={this.transferEarnings.bind(this)}
+                    action={this.removeItem.bind(this)}
                     cancel={this.hideDialogs.bind(this)}/>
                 }
             </div>

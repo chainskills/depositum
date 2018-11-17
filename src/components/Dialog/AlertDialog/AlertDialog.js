@@ -11,12 +11,6 @@ class AlertDialog extends Component {
     constructor(props, context) {
         super(props)
 
-        this.state = {
-            open: false,
-            title: '',
-            message: '',
-            asset: null
-        }
         this.handleClose = this.handleClose.bind(this);
     }
 
@@ -68,7 +62,7 @@ class AlertDialog extends Component {
                             color="secondary"
                             focusRipple={true}
                             onClick={() => {
-                                this.props.action(this.state.assetId);}}>
+                                this.props.action(this.props.assetId);}}>
                             Yes
                         </Button>
                     </DialogActions>
