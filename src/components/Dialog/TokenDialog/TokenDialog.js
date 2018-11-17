@@ -13,50 +13,26 @@ const styles = theme => ({
         fontSize: 18,
         padding: 5,
         lineHeight: 1.5
-    },
-    formControl: {
-        marginTop: theme.spacing.unit * 3,
     }
 });
 
 class TokenDialog extends Component {
     constructor(props) {
         super(props);
-
-        this.state = {
-            action: '',
-            openTokenDialog: false,
-            dialogTitle: '',
-            tokenRate: ''
-        };
-
+        this.state = {};
         this.handleClose = this.handleClose.bind(this);
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-
-        if ((typeof nextProps.action === "undefined") || (nextProps.action === "")) {
-            // do not process this component if it's not required
+    componentDidUpdate(prevProps) {
+        if (prevProps.type === this.props.type) {
+            // component already opened
             return;
         }
-
-        if (this.state.openTokenDialog) {
-            // do not process this component if it's not required
-            return;
-        }
-
-        this.setState({
-            action: nextProps.action,
-            openTokenDialog: nextProps.open,
-            dialogTitle: nextProps.dialogTitle,
-            tokenRate: nextProps.tokenRate
-        });
     }
 
     // close the form
     handleClose = () => {
-        this.resetState();
-        this.props.cancelDialog();
+        this.props.cancel();
     }
 
     setTokens = (e) => {
@@ -65,35 +41,33 @@ class TokenDialog extends Component {
         });
     };
 
-    // buy tokens
-    buyTokens = (event) => {
-        this.resetState();
-        this.props.buyTokens(this.state.tokens);
+    // send the action to buy or mint tokens
+    sendAction = (event) => {
+        this.props.action(this.state.tokens);
     }
 
-    // reset the component
-    resetState = () => {
-        this.setState({
-            action: '',
-            openTokenDialog: false,
-            dialogTitle: '',
-            tokenRate: ''
-        });
-    }
 
 
     render() {
-        if ((typeof this.state.action === "undefined" || this.state.action === "")) {
-            // do not render if it's not required
+        console.log("render->dialog");
+        if ((typeof this.props.type === "undefined") || (this.props.type === "")) {
+            // do not process this component if it's not required
             return null;
         }
+
+        if ((typeof this.props.open === "undefined") || (this.props.open === false)) {
+            // do not process this component if it's not required
+            return null;
+        }
+
+        // fetch styles from hoc withStyles
         const {classes} = this.props;
 
         return (
             <div>
                 <Dialog
                     id={"tokendialog"}
-                    open={(typeof this.state.openTokenDialog === 'undefined') ? false : this.state.openTokenDialog}
+                    open={(typeof this.props.open === 'undefined') ? false : this.props.open}
                     onClose={this.handleClose}
                     aria-labelledby="tokendialog-title"
                     disableBackdropClick={true}
@@ -102,12 +76,12 @@ class TokenDialog extends Component {
                     maxWidth={'md'}
                 >
 
-                    <DialogTitle id="tokendialog-title">{this.state.dialogTitle}</DialogTitle>
+                    <DialogTitle id="tokendialog-title">{this.props.title}</DialogTitle>
 
                     <DialogContent>
                         <TextField
                             label="Rate (ETH)"
-                            defaultValue={this.state.tokenRate}
+                            defaultValue={this.props.tokenRate}
                             fullWidth
                             margin="normal"
                             InputProps={{
@@ -118,6 +92,7 @@ class TokenDialog extends Component {
                             }}
                         />
 
+                        {this.props.type === "buy" &&
                         <TextField
                             label="Depositum Token (DPN)"
                             type="number"
@@ -135,25 +110,42 @@ class TokenDialog extends Component {
                                 min: 0
                             }}
                         />
+                        }
 
-
+                        {this.props.type === "mint" &&
+                        <TextField
+                            label="Number of Depositum Token (DPN) to mint"
+                            type="number"
+                            defaultValue={this.state.mint}
+                            fullWidth
+                            onChange={e => {
+                                this.setTokens(e.target.value)
+                            }}
+                            margin="normal"
+                            inputProps={{
+                                classes: {
+                                    input: classes.textSettings,
+                                },
+                                step: 1,
+                                min: 0
+                            }}
+                        />
+                        }
                     </DialogContent>
 
                     <DialogActions>
                         <div>
                             <Button
-                                label="Cancel"
                                 color={"secondary"}
                                 onClick={() => {
                                     this.handleClose();
                                 }}>Cancel</Button>
                             <Button
-                                label="Buy"
                                 color="primary"
                                 focusRipple={true}
                                 onClick={() => {
-                                    this.buyTokens();
-                                }}>Buy</Button>
+                                    this.sendAction();
+                                }}>Send</Button>
                         </div>
                     </DialogActions>
 

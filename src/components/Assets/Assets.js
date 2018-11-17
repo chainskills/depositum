@@ -9,8 +9,7 @@ import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS'
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
-import TokenDialog from '../Dialog/TokenDialog/TokenDialog';
-import MintDialog from '../Dialog/MintDialog/MintDialog';
+import Token from './Tokens/Tokens';
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
 
@@ -79,7 +78,7 @@ class Assets extends Component {
     componentWillUnmount() {
         if (this.event != null) {
             this.event.unsubscribe();
-         }
+        }
         if (this.event2 != null) {
             this.event2.unsubscribe();
         }
@@ -90,7 +89,7 @@ class Assets extends Component {
     }
 
     listenEvents = () => {
-        this.event = this.assetContract.events.NewAsset({fromBlock:'latest', toBlock:'latest'})
+        this.event = this.assetContract.events.NewAsset({fromBlock: 'latest', toBlock: 'latest'})
             .on("data", function (event) {
                 console.log(event);
             })
@@ -98,14 +97,14 @@ class Assets extends Component {
                 console.error(error);
             });
 
-        this.event2 = this.assetContract.events.Transfer({fromBlock:'latest', toBlock:'latest'})
+        this.event2 = this.assetContract.events.Transfer({fromBlock: 'latest', toBlock: 'latest'})
             .on("data", function (event) {
                 console.log(event);
             })
             .on("error", function (error) {
                 console.error(error);
             });
-        this.event3 = this.assetContract.events.Approval({fromBlock:'latest', toBlock:'latest'})
+        this.event3 = this.assetContract.events.Approval({fromBlock: 'latest', toBlock: 'latest'})
             .on("data", function (event) {
                 console.log(event);
             })
@@ -117,7 +116,6 @@ class Assets extends Component {
 
     hideDialogs = () => {
         this.setState({
-            openMintDialog: false,
             openTokenDialog: false,
             openAssetDialog: false,
             openAlertDialog: false
@@ -125,63 +123,33 @@ class Assets extends Component {
     }
 
     handleBuyTokens = () => {
+        console.log("aaa");
         this.hideDialogs();
         this.setState({
-            openTokenDialog: true
-        });
-    }
-
-    buyTokens = (tokens) => {
-        this.cancelDialog();
-
-        const price = tokens * this.tokenRate;
-        if (price === 0) {
-            return;
-        }
-
-        this.assetContract.methods.buyTokens.cacheSend({
-            from: this.props.accounts[0],
-            value: price,
-            gas: 500000
+            type: "buy",
+            openTokenDialog: true,
+            title: "Buy Depositum tokens",
+            message: ''
         });
     }
 
     handleMintTokens = () => {
         this.hideDialogs();
         this.setState({
-            openMintDialog: true
+            type: "mint",
+            openTokenDialog: true,
+            title: "Mint new Depositum tokens",
+            message: ''
         });
     }
-
-    mintTokens = (tokens) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.mint.cacheSend(tokens, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
-    }
-
 
     handleTransferEarnings = () => {
-        let title = `Transfer Earning`;
-        let message = `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`;
-
         this.hideDialogs();
         this.setState({
-            dialogTitle: title,
-            message: message,
-            action: this.transferEarnings.bind(this),
-            openAlertDialog: true
-        });
-    }
-
-    transferEarnings = () => {
-        this.cancelDialog();
-
-        this.assetContract.methods.transferEarnings.cacheSend({
-            from: this.props.accounts[0],
-            gas: 500000
+            type: "transfer",
+            openTokenDialog: true,
+            title: "Mint new Depositum tokens",
+            message: `Are you sure to transfer your earnings of an amount of ${this.earnings} ETH?`
         });
     }
 
@@ -524,31 +492,34 @@ class Assets extends Component {
 
         // get the rate
         this.tokenRate = 0;
-        if(this.rateKey in this.props.AssetContract["getRate"]) {
-            this.tokenRate = this.props.AssetContract["getRate"][this.rateKey].value;
+        if (this.rateKey in this.props.AssetContract["getRate"]) {
+            const rate = this.props.AssetContract["getRate"][this.rateKey].value;
+            //this.tokenRate = rate !== "undefined" ? this.web3.utils.fromWei(this.web3.utils.toBN(rate), "ether") : 0;
+            this.tokenRate = rate;
+
         }
 
         // get the number of tokens
         this.tokens = 0;
-        if(this.tokensKey in this.props.AssetContract["balanceOf"]) {
+        if (this.tokensKey in this.props.AssetContract["balanceOf"]) {
             this.tokens = this.props.AssetContract["balanceOf"][this.tokensKey].value;
         }
 
         // get the rate
         this.serviceFee = 0;
-        if(this.serviceFeeKey in this.props.AssetContract["getServiceFee"]) {
+        if (this.serviceFeeKey in this.props.AssetContract["getServiceFee"]) {
             this.serviceFee = this.props.AssetContract["getServiceFee"][this.serviceFeeKey].value;
         }
 
         // check if we are the contract owner the rate
         this.isContractOwner = false;
-        if(this.isOwnerKey in this.props.AssetContract["isContractOwner"]) {
+        if (this.isOwnerKey in this.props.AssetContract["isContractOwner"]) {
             this.isContractOwner = this.props.AssetContract["isContractOwner"][this.isOwnerKey].value;
         }
 
         // get earnings
         this.earnings = 0;
-        if(this.earningsKey in this.props.AssetContract["getEarnings"]) {
+        if (this.earningsKey in this.props.AssetContract["getEarnings"]) {
             this.earnings = this.web3.utils.fromWei(this.props.AssetContract["getEarnings"][this.earningsKey].value, "ether");
         }
 
@@ -599,8 +570,6 @@ class Assets extends Component {
             }
         }
 
-        console.log("aaaa");
-
         return (
             <div>
                 <Container>
@@ -622,12 +591,12 @@ class Assets extends Component {
                         <Col xs={12} lg={12}>
                             <div className={"addItem"}>
                                 {Number(this.tokens) >= Number(this.serviceFee) &&
-                                    <Button className={"add-button margin-button"} variant="contained" color="primary"
-                                            onClick={() => {
-                                                this.handleNewAsset();
-                                            }}>
-                                        New Asset
-                                    </Button>
+                                <Button className={"add-button margin-button"} variant="contained" color="primary"
+                                        onClick={() => {
+                                            this.handleNewAsset();
+                                        }}>
+                                    New Asset
+                                </Button>
                                 }
 
                                 {this.isContractOwner &&
@@ -679,21 +648,18 @@ class Assets extends Component {
                     updateAsset={this.updateAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
-                <TokenDialog
-                    action={"buy"}
+
+                <Token
+                    type={this.state.type}
                     open={this.state.openTokenDialog}
-                    dialogTitle={"Buy Depositum tokens"}
-                    tokenRate={typeof this.tokenRate !== "undefined" ? this.web3.utils.fromWei(this.web3.utils.toBN(this.tokenRate), "ether") : 0}
-                    buyTokens={this.buyTokens.bind(this)}
-                    cancelDialog={this.cancelDialog.bind(this)}/>
-
-                <MintDialog
-                    action={"mint"}
-                    open={this.state.openMintDialog}
-                    dialogTitle={"Mint Depositum tokens"}
-                    mintTokens={this.mintTokens.bind(this)}
-                    cancelDialog={this.cancelDialog.bind(this)}/>
-
+                    title={this.state.title}
+                    message={this.props.message}
+                    account={this.props.accounts[0]}
+                    web3={this.web3}
+                    contract={this.assetContract}
+                    rate={typeof this.tokenRate !== "undefined" ? this.tokenRate : 0}
+                    cancel={this.cancelDialog.bind(this)}
+                    />
 
                 <AlertDialog
                     open={this.state.openAlertDialog}
