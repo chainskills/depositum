@@ -25,14 +25,9 @@ class TokenDialog extends Component {
 
     componentDidUpdate(prevProps) {
         if (prevProps.type === this.props.type) {
-            // component already opened
+            // no changes on the component
             return;
         }
-    }
-
-    // close the form
-    handleClose = () => {
-        this.props.cancel();
     }
 
     setTokens = (e) => {
@@ -40,12 +35,6 @@ class TokenDialog extends Component {
             tokens: e
         });
     };
-
-    // send the action to buy or mint tokens
-    sendAction = (event) => {
-        this.props.action(this.state.tokens);
-    }
-
 
     render() {
         if ((typeof this.props.type === "undefined") || (this.props.type === "")) {
@@ -136,13 +125,13 @@ class TokenDialog extends Component {
                             <Button
                                 color={"secondary"}
                                 onClick={() => {
-                                    this.handleClose();
+                                    this.props.cancel();
                                 }}>Cancel</Button>
                             <Button
                                 color="primary"
                                 focusRipple={true}
                                 onClick={() => {
-                                    this.sendAction();
+                                    this.props.action(this.state.tokens);
                                 }}>Send</Button>
                         </div>
                     </DialogActions>

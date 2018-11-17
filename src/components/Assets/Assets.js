@@ -9,6 +9,7 @@ import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS'
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
+import Asset from './Asset/Asset';
 import Token from './Tokens/Tokens';
 import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
@@ -168,30 +169,6 @@ class Assets extends Component {
         });
     }
 
-    addAsset = (asset) => {
-        this.cancelDialog();
-
-        if (asset.imageBuffer != null) {
-            // save the document to IPFS
-            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
-                if (error) {
-                    console.error(error)
-                    return
-                }
-
-                let price = asset.price;
-                if (price !== '') {
-                    price = this.web3.utils.toWei(price, "ether");
-                }
-
-                this.assetContract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, price, {
-                    from: this.props.accounts[0],
-                    gas: 500000
-                });
-
-            });
-        }
-    }
 
     handleEdit = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
@@ -222,7 +199,7 @@ class Assets extends Component {
         }.bind(this));
     }
 
-    handleDetails = (assetId) => {
+    handleView = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
             if (asset._owner === "0x0000000000000000000000000000000000000000") {
@@ -557,7 +534,7 @@ class Assets extends Component {
                                                      actionUnset={this.handleUnsetMarketplace.bind(this)}
                                                      actionRemove={this.handleRemove.bind(this)}
                                                      actionEdit={this.handleEdit.bind(this)}
-                                                     actionView={this.handleDetails.bind(this)}
+                                                     actionView={this.handleView.bind(this)}
                                                      actionDeposit={this.handleDeposit.bind(this)}
                                                      actionPurchase={this.handlePurchase.bind(this)}
                                                      actionRefund={this.handleRefund.bind(this)}/>
@@ -634,6 +611,22 @@ class Assets extends Component {
 
                 </Container>
 
+                <Asset
+                    action={this.state.action}
+                    open={this.state.openAssetDialog2}
+                    title={this.state.title}
+                    message={this.state.message}
+                    account={this.props.accounts[0]}
+                    web3={this.web3}
+                    contract={this.assetContract}
+                    assetId={this.state.assetId}
+                    owner={this.state.owner}
+                    name={this.state.name}
+                    description={this.state.description}
+                    imageSource={this.state.imageSource}
+                    price={this.state.price}
+                    cancelDialog={this.cancelDialog.bind(this)}/>
+
                 <AssetDialog
                     action={this.state.action}
                     open={this.state.openAssetDialog}
@@ -647,7 +640,6 @@ class Assets extends Component {
                     addAsset={this.addAsset.bind(this)}
                     updateAsset={this.updateAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
-
 
                 <Token
                     type={this.state.type}

@@ -72,6 +72,30 @@ class AssetDialog extends Component {
         });
     }
 
+    componentDidUpdate(prevProps) {
+        if (prevProps.name !== this.props.name) {
+            this.setState({name: this.props.name});
+        }
+
+        if (prevProps.description !== this.props.name) {
+            this.setState({description: this.props.description});
+        }
+
+        if (prevProps.price !== this.props.price) {
+            this.setState({price: this.props.price});
+        }
+
+        if (prevProps.imageSource !== this.props.imageSource) {
+            let _imageSource = '/images/asset.png';
+            if ((typeof this.props.imageSource !== "undefined") && (this.props.imageSource !== "")) {
+                _imageSource = this.props.imageSource;
+            }
+
+            this.setState({imageSource: _imageSource});
+        }
+    }
+
+
     checkValidity = (title, description) => {
         if (title.trim() === '') {
             this.setState({nameError: true});
@@ -182,10 +206,16 @@ class AssetDialog extends Component {
     }
 
     render() {
-        if ((typeof this.state.action === "undefined" || this.state.action === "")) {
-            // do not render if it's not required
+        if ((typeof this.props.type === "undefined") || (this.props.type === "")) {
+            // do not process this component if it's not required
             return null;
         }
+
+        if ((typeof this.props.open === "undefined") || (this.props.open === false)) {
+            // do not process this component if it's not required
+            return null;
+        }
+
         const {classes} = this.props;
 
         // process image source
@@ -198,7 +228,7 @@ class AssetDialog extends Component {
             <div>
                 <Dialog
                     id={"assetdialog"}
-                    open={(typeof this.state.openAssetDialog === 'undefined') ? false : this.state.openAssetDialog}
+                    open={(typeof this.props.open === 'undefined') ? false : this.props.open}
                     onClose={this.handleClose}
                     aria-labelledby="assetdialog-title"
                     disableBackdropClick={true}
@@ -207,7 +237,7 @@ class AssetDialog extends Component {
                     maxWidth={'md'}
                 >
 
-                    <DialogTitle id="assetdialog-title">{this.state.dialogTitle}</DialogTitle>
+                    <DialogTitle id="assetdialog-title">{this.props.title}</DialogTitle>
 
                     <DialogContent>
 
@@ -217,7 +247,7 @@ class AssetDialog extends Component {
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${imageSourceNew}`}/>
                                 </Grid>
-                                {this.state.action !== "read" &&
+                                {this.state.type !== "read" &&
                                 <Grid item>
                                     <input type='file' className={classes.inputFile} onChange={this.loadFile} accept="image/*" ref={'file-upload'} />
                                     <Button
@@ -245,7 +275,7 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
-                                        readOnly: this.state.action === "read" ? true : false
+                                        readOnly: this.props.type === "read" ? true : false
                                     }}
                                 />
 
@@ -264,7 +294,7 @@ class AssetDialog extends Component {
                                         classes: {
                                             input: classes.textSettings,
                                         },
-                                        readOnly: this.state.action === "read" ? true : false
+                                        readOnly: this.props.type === "read" ? true : false
                                     }}
                                 />
 
@@ -283,7 +313,7 @@ class AssetDialog extends Component {
                                         },
                                         step: 0.01,
                                         min: 0,
-                                        readOnly: this.state.action === "read" ? true : false
+                                        readOnly: this.props.type === "read" ? true : false
                                     }}
                                 />
                             </Grid>
@@ -293,7 +323,7 @@ class AssetDialog extends Component {
                     </DialogContent>
 
                     <DialogActions>
-                        {this.state.action === "read" &&
+                        {this.state.type === "read" &&
                         <div>
                             <Button
                                 label="Close"
@@ -305,7 +335,7 @@ class AssetDialog extends Component {
                         </div>
                         }
 
-                        {this.state.action === "new" &&
+                        {this.state.type === "new" &&
                         <div>
                             <Button
                                 label="Cancel"
@@ -324,7 +354,7 @@ class AssetDialog extends Component {
                         </div>
                         }
 
-                        {this.state.action === "edit" &&
+                        {this.state.type === "edit" &&
                         <div>
                             <Button
                                 label="Cancel"

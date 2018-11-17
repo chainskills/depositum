@@ -6,10 +6,12 @@ import AlertDialog from '../../Dialog/AlertDialog/AlertDialog';
 
 class Tokens extends Component {
 
-    constructor(props, context) {
+    constructor(props) {
         super(props)
 
         this.state = {};
+
+        // TODO: subscribe to events specifics to tokens
     }
 
     hideDialogs = () => {
@@ -51,7 +53,6 @@ class Tokens extends Component {
     }
 
     componentDidUpdate(prevProps) {
-
         if (prevProps.open !== this.props.open) {
             this.setState({
                 open: this.props.open
