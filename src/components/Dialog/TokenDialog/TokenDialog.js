@@ -20,7 +20,6 @@ class TokenDialog extends Component {
     constructor(props) {
         super(props);
         this.state = {};
-        this.handleClose = this.handleClose.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -55,7 +54,7 @@ class TokenDialog extends Component {
                 <Dialog
                     id={"tokendialog"}
                     open={(typeof this.props.open === 'undefined') ? false : this.props.open}
-                    onClose={this.handleClose}
+                    onClose={this.props.cancel}
                     aria-labelledby="tokendialog-title"
                     disableBackdropClick={true}
                     disableEscapeKeyDown={true}

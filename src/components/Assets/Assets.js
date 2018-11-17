@@ -4,15 +4,14 @@ import {Jumbotron, Card, CardBody, CardText, CardTitle, Col, Container, Row} fro
 import Button from '@material-ui/core/Button';
 import {ContractData} from 'drizzle-react-components'
 
-import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
+import {IPFS_READ_URL} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
 
 import Asset from './Asset/Asset';
 import Token from './Tokens/Tokens';
-import AssetDialog from '../Dialog/AssetDialog/AssetDialog';
-import AlertDialog from '../Dialog/AlertDialog/AlertDialog';
+import Marketplace from './Marketplace/Marketplace';
 
 import './Assets.css';
 
@@ -119,8 +118,22 @@ class Assets extends Component {
         this.setState({
             openTokenDialog: false,
             openAssetDialog: false,
-            openAssetDialog2: false,
-            openAlertDialog: false
+            openMarketplace: false
+        });
+    }
+
+    cancelDialog = () => {
+        this.hideDialogs();
+        this.setState({
+            action: '',
+            dialogTitle: '',
+            assetId: '',
+            owner: '',
+            name: '',
+            description: '',
+            imageSource: '',
+            ipfsHashKey: '',
+            price: ''
         });
     }
 
@@ -174,7 +187,7 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             price: '',
-            openAssetDialog2: true
+            openAssetDialog: true
         });
     }
 
@@ -201,7 +214,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog2: true
+                openAssetDialog: true
             });
 
         }.bind(this));
@@ -230,7 +243,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog2: true
+                openAssetDialog: true
             });
 
         }.bind(this));
@@ -255,39 +268,34 @@ class Assets extends Component {
                 title: title,
                 message: message,
                 assetId: assetId,
-                openAssetDialog2: true
+                openAssetDialog: true
             });
         }.bind(this));
     }
 
+    //
+    // Manage marketplace
+    //
 
-    handleSetMarketplace = (assetId) => {
+
+    handleAddInMarketplace = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
-            const title = `Available in the marketplace`;
-            const message = `Are you sure to set your asset available in the marketplace?`;
+            const title = `Sell in the marketplace`;
+            const message = `Are you sure to sell your asset in the marketplace?`;
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'add',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.setMarketplace.bind(this),
-                openAlertDialog: true
+                openMarketplace: true
             });
         }.bind(this));
     }
 
-    setMarketplace = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.setMarketplace.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
-    }
-
-    handleUnsetMarketplace = (assetId) => {
+    handleRemoveFromMarketplace = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
             let price = this.web3.utils.fromWei(asset._price, "ether");
@@ -302,22 +310,13 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'remove',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.unsetMarketplace.bind(this),
-                openAlertDialog: true
+                openMarketplace: true
             });
         }.bind(this));
-    }
-
-    unsetMarketplace = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.unsetMarketplace.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
     }
 
     handleDeposit = (assetId) => {
@@ -330,28 +329,16 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'deposit',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.deposit.bind(this),
-                openAlertDialog: true
+                openMarketplace: true
             });
         }.bind(this));
     }
 
-    deposit = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
-            this.assetContract.methods.deposit.cacheSend(assetId, {
-                from: this.props.accounts[0],
-                value: asset._price,
-                gas: 500000
-            });
-        }.bind(this));
-    }
-
-    handlePurchase = (assetId) => {
+     handlePurchase = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
             let price = this.web3.utils.fromWei(asset._price, "ether");
@@ -361,22 +348,13 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'purchase',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.purchaseAsset.bind(this),
-                openAlertDialog: true
+                openMarketplace: true
             });
         }.bind(this));
-    }
-
-    purchaseAsset = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.purchaseAsset.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
     }
 
     handleRefund = (assetId) => {
@@ -389,37 +367,15 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                dialogTitle: title,
+                type: 'refund',
+                title: title,
                 message: message,
                 assetId: assetId,
-                action: this.refundPurchase.bind(this),
-                openAlertDialog: true
+                openMarketplace: true
             });
         }.bind(this));
     }
 
-    refundPurchase = (assetId) => {
-        this.cancelDialog();
-
-        this.assetContract.methods.refundPurchase.cacheSend(assetId, {
-            from: this.props.accounts[0],
-            gas: 500000
-        });
-    }
-
-    cancelDialog = () => {
-        this.hideDialogs();
-        this.setState({
-            action: '',
-            dialogTitle: '',
-            assetId: '',
-            owner: '',
-            name: '',
-            description: '',
-            imageSource: '',
-            price: ''
-        });
-    }
 
 
     render() {
@@ -498,8 +454,8 @@ class Assets extends Component {
                                 <ContractDataActions contract={this.assetContract.contractName} method="getAsset"
                                                      assetId={assetId}
                                                      account={this.props.accounts[0]}
-                                                     actionSet={this.handleSetMarketplace.bind(this)}
-                                                     actionUnset={this.handleUnsetMarketplace.bind(this)}
+                                                     actionSet={this.handleAddInMarketplace.bind(this)}
+                                                     actionUnset={this.handleRemoveFromMarketplace.bind(this)}
                                                      actionRemove={this.handleRemove.bind(this)}
                                                      actionEdit={this.handleEdit.bind(this)}
                                                      actionView={this.handleView.bind(this)}
@@ -581,7 +537,7 @@ class Assets extends Component {
 
                 <Asset
                     type={this.state.type}
-                    open={this.state.openAssetDialog2}
+                    open={this.state.openAssetDialog}
                     title={this.state.title}
                     message={this.state.message}
                     account={this.props.accounts[0]}
@@ -608,13 +564,14 @@ class Assets extends Component {
                     cancel={this.cancelDialog.bind(this)}
                     />
 
-                <AlertDialog
-                    open={this.state.openAlertDialog}
-                    dialogTitle={this.state.dialogTitle}
+                <Marketplace
+                    type={this.state.type}
+                    open={this.state.openMarketplace}
+                    title={this.state.title}
                     message={this.state.message}
                     assetId={this.state.assetId}
-                    action={this.state.action}
-                    cancelDialog={this.cancelDialog.bind(this)}/>
+                    contract={this.assetContract}
+                    cancel={this.cancelDialog.bind(this)}/>
             </div>
         );
     }
