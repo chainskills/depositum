@@ -43,6 +43,37 @@ class Asset extends Component {
             });
         }
     }
+
+    updateAsset = (asset) => {
+        this.hideDialogs();
+
+        let price = asset.price;
+        if (price !== '') {
+            price = this.props.web3.utils.toWei(price, "ether");
+        }
+
+        if (asset.imageBuffer != null) {
+            // save the document to IPFS
+            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
+                if (error) {
+                    console.error(error)
+                    return
+                }
+
+                this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, {
+                    from: this.props.accounts[0],
+                    gas: 500000
+                });
+
+            });
+        } else {
+            // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
+            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.state.ipfsHashKey, price, {
+                from: this.props.accounts[0],
+                gas: 500000
+            });
+        }
+    }
     
     componentDidUpdate(prevProps) {
         if (prevProps.open !== this.props.open) {
@@ -63,8 +94,8 @@ class Asset extends Component {
         return (
             <div>
                 <AssetDialog
-                    open={this.props.open}
                     type={this.props.type}
+                    open={this.props.open}
                     title={this.props.title}
                     assetId={this.props.assetId}
                     owner={this.props.owner}

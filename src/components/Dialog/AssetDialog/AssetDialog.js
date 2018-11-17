@@ -43,35 +43,6 @@ class AssetDialog extends Component {
         this.handleClose = this.handleClose.bind(this);
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-
-        if ((typeof nextProps.action === "undefined") || (nextProps.action === "")) {
-            // do not process this component if it's not required
-            return;
-        }
-
-        if (this.state.openAssetDialog) {
-            // do not process this component if it's not required
-            return;
-        }
-
-        let _imageSource = '/images/asset.png';
-        if ((typeof nextProps.imageSource !== "undefined") && (nextProps.imageSource !== "")) {
-            _imageSource = nextProps.imageSource;
-        }
-
-        this.setState({
-            action: nextProps.action,
-            openAssetDialog: nextProps.open,
-            dialogTitle: nextProps.dialogTitle,
-            assetId: nextProps.assetId,
-            name: nextProps.name,
-            description: nextProps.description,
-            price: nextProps.price,
-            imageSource: _imageSource
-        });
-    }
-
     componentDidUpdate(prevProps) {
         if (prevProps.name !== this.props.name) {
             this.setState({name: this.props.name});
@@ -118,7 +89,7 @@ class AssetDialog extends Component {
     // close the form
     handleClose = () => {
         this.resetState();
-        this.props.cancelDialog();
+        this.props.cancel();
     }
 
     setName = (e) => {
@@ -141,22 +112,8 @@ class AssetDialog extends Component {
         });
     };
 
-    // Add a new asset
-    addAsset = (event) => {
-        const {name, description, imageBuffer, price} = this.state;
-
-        if (!this.checkValidity(name, description)) {
-            return;
-        }
-
-        let asset = {name, description, imageBuffer, price};
-
-        this.resetState();
-        this.props.addAsset(asset);
-    }
-
-    // Update the asset
-    updateAsset = (event) => {
+    // save the asset
+    saveAsset = (event) => {
         const {assetId, name, description, imageBuffer, newImageSource, price} = this.state;
 
         if (!this.checkValidity(name, description)) {
@@ -168,16 +125,16 @@ class AssetDialog extends Component {
         let asset = {assetId, name, description, imageBuffer, ipfsHashKey, price};
 
         this.resetState();
-        this.props.updateAsset(asset);
+        this.props.action(asset);
     }
 
 
     // reset the component
     resetState = () => {
         this.setState({
-            action: '',
-            openAssetDialog: false,
-            dialogTitle: '',
+            type: '',
+            open: false,
+            title: '',
             assetId: '',
             name: '',
             description: '',
@@ -247,7 +204,7 @@ class AssetDialog extends Component {
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${imageSourceNew}`}/>
                                 </Grid>
-                                {this.state.type !== "read" &&
+                                {this.props.type !== "read" &&
                                 <Grid item>
                                     <input type='file' className={classes.inputFile} onChange={this.loadFile} accept="image/*" ref={'file-upload'} />
                                     <Button
@@ -323,38 +280,38 @@ class AssetDialog extends Component {
                     </DialogContent>
 
                     <DialogActions>
-                        {this.state.type === "read" &&
+                        {this.props.type === "read" &&
                         <div>
                             <Button
                                 label="Close"
                                 color={"secondary"}
                                 onClick={() => {
                                     this.handleClose();
-                                    this.props.cancelDialog();
+                                    this.props.cancel();
                                 }}>Close</Button>
                         </div>
                         }
 
-                        {this.state.type === "new" &&
+                        {this.props.type === "new" &&
                         <div>
                             <Button
                                 label="Cancel"
                                 color={"secondary"}
                                 onClick={() => {
                                     this.handleClose();
-                                    this.props.cancelDialog();
+                                    this.props.cancel();
                                 }}>Cancel</Button>
                             <Button
                                 label="Save"
                                 color="primary"
                                 focusRipple={true}
                                 onClick={() => {
-                                    this.addAsset();
+                                    this.saveAsset();
                                 }}>Save</Button>
                         </div>
                         }
 
-                        {this.state.type === "edit" &&
+                        {this.props.type === "edit" &&
                         <div>
                             <Button
                                 label="Cancel"
@@ -367,7 +324,7 @@ class AssetDialog extends Component {
                                 color="primary"
                                 focusRipple={true}
                                 onClick={() => {
-                                    this.updateAsset();
+                                    this.saveAsset();
                                 }}>Save</Button>
                         </div>
                         }

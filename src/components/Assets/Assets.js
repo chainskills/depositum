@@ -119,6 +119,7 @@ class Assets extends Component {
         this.setState({
             openTokenDialog: false,
             openAssetDialog: false,
+            openAssetDialog2: false,
             openAlertDialog: false
         });
     }
@@ -157,15 +158,15 @@ class Assets extends Component {
     handleNewAsset = () => {
         this.hideDialogs();
         this.setState({
-            action: 'new',
-            dialogTitle: 'Create new asset',
+            type: 'new',
+            title: 'Create new asset',
             assetId: '',
             owner: '',
             name: '',
             description: '',
             imageSource: '',
             price: '',
-            openAssetDialog: true
+            openAssetDialog2: true
         });
     }
 
@@ -612,7 +613,7 @@ class Assets extends Component {
                 </Container>
 
                 <Asset
-                    action={this.state.action}
+                    type={this.state.type}
                     open={this.state.openAssetDialog2}
                     title={this.state.title}
                     message={this.state.message}
@@ -625,7 +626,7 @@ class Assets extends Component {
                     description={this.state.description}
                     imageSource={this.state.imageSource}
                     price={this.state.price}
-                    cancelDialog={this.cancelDialog.bind(this)}/>
+                    cancel={this.cancelDialog.bind(this)}/>
 
                 <AssetDialog
                     action={this.state.action}
@@ -637,7 +638,6 @@ class Assets extends Component {
                     description={this.state.description}
                     imageSource={this.state.imageSource}
                     price={this.state.price}
-                    addAsset={this.addAsset.bind(this)}
                     updateAsset={this.updateAsset.bind(this)}
                     cancelDialog={this.cancelDialog.bind(this)}/>
 
