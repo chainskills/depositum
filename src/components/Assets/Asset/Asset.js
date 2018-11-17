@@ -61,15 +61,15 @@ class Asset extends Component {
                 }
 
                 this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, {
-                    from: this.props.accounts[0],
+                    from: this.props.account,
                     gas: 500000
                 });
 
             });
         } else {
             // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
-            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.state.ipfsHashKey, price, {
-                from: this.props.accounts[0],
+            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.props.ipfsHashKey, price, {
+                from: this.props.account,
                 gas: 500000
             });
         }

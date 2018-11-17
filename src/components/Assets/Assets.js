@@ -170,7 +170,6 @@ class Assets extends Component {
         });
     }
 
-
     handleEdit = (assetId) => {
         this.assetContract.methods.getAsset(assetId).call().then(function (asset) {
 
@@ -185,8 +184,8 @@ class Assets extends Component {
 
             this.hideDialogs();
             this.setState({
-                action: 'edit',
-                dialogTitle: 'Edit your asset',
+                type: 'edit',
+                title: 'Edit your asset',
                 assetId: assetId,
                 owner: asset._owner,
                 name: asset._name,
@@ -194,7 +193,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
-                openAssetDialog: true
+                openAssetDialog2: true
             });
 
         }.bind(this));
@@ -625,6 +624,7 @@ class Assets extends Component {
                     name={this.state.name}
                     description={this.state.description}
                     imageSource={this.state.imageSource}
+                    ipfsHashKey={this.state.ipfsHashKey}
                     price={this.state.price}
                     cancel={this.cancelDialog.bind(this)}/>
 

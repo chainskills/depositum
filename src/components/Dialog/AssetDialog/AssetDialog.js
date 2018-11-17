@@ -28,10 +28,6 @@ class AssetDialog extends Component {
         super(props);
 
         this.state = {
-            action: '',
-            openAssetDialog: false,
-            dialogTitle: '',
-            assetId: '',
             name: '',
             description: '',
             imageBuffer: null,
@@ -43,29 +39,29 @@ class AssetDialog extends Component {
         this.handleClose = this.handleClose.bind(this);
     }
 
-    componentDidUpdate(prevProps) {
-        if (prevProps.name !== this.props.name) {
-            this.setState({name: this.props.name});
+
+    static getDerivedStateFromProps(nextProps, prevState){
+
+        if (typeof nextProps.type === "undefined") {
+            // not ready yet
+            return null;
         }
 
-        if (prevProps.description !== this.props.name) {
-            this.setState({description: this.props.description});
+        if (nextProps.type === prevState.type) {
+            // fields already updated or nothing to can
+            return null;
         }
 
-        if (prevProps.price !== this.props.price) {
-            this.setState({price: this.props.price});
-        }
-
-        if (prevProps.imageSource !== this.props.imageSource) {
-            let _imageSource = '/images/asset.png';
-            if ((typeof this.props.imageSource !== "undefined") && (this.props.imageSource !== "")) {
-                _imageSource = this.props.imageSource;
-            }
-
-            this.setState({imageSource: _imageSource});
-        }
+        // pre-fill the state only the first time
+        return ({
+            type: nextProps.type,
+            assetId: nextProps.assetId,
+            name: nextProps.name,
+            description: nextProps.description,
+            price: nextProps.price,
+            imageSource: nextProps.imageSource
+        });
     }
-
 
     checkValidity = (title, description) => {
         if (title.trim() === '') {
@@ -180,6 +176,8 @@ class AssetDialog extends Component {
         if (this.state.newImageSource !== "") {
             imageSourceNew = this.state.newImageSource;
         }
+
+        //console.log(this.state);
 
         return (
             <div>
