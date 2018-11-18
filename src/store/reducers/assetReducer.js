@@ -3,20 +3,22 @@ import {updateObject} from "../../shared/utility";
 
 
 const initialState = {
-    message: ""
+    isOwner: false,
+    earnings: 0
 }
 
 
-const updateMenu = (state = initialState, action) => {
+const assetFetched = (state = initialState, action) => {
     return updateObject(state, {
-        message: action.message
+        isOwner: action.isOwner,
+        earnings: action.earnings
     });
 };
 
 const reducer = ( state = initialState, action ) => {
     switch ( action.type ) {
-        case actionTypes.UPDATE_MENU:
-            return updateMenu(state, action);
+        case actionTypes.ASSET_FETCHED:
+            return assetFetched(state, action);
 
         default:
             return state;

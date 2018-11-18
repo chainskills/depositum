@@ -1,9 +1,10 @@
 import * as actionTypes from './actionTypes';
 
 
-export const updateMenu = (message) => {
+export const updateMenu = (isOwner, earnings) => {
     return {
-        type: actionTypes.UPDATE_MENU,
-        message: message
+        type: actionTypes.ASSET_FETCHED,
+        isOwner: isOwner,
+        earnings: earnings
     };
 };

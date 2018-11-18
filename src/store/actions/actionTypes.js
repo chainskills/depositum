@@ -1,1 +1,1 @@
-export const UPDATE_MENU = 'UPDATE_MENU';
+export const ASSET_FETCHED = 'ASSET_FETCHED';

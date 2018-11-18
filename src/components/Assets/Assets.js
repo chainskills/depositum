@@ -379,8 +379,6 @@ class Assets extends Component {
 
 
     render() {
-        this.props.OnMessage("Hello");
-
         // refresh balance
         this.web3.eth.getBalance(this.props.accounts[0]).then(function (_balance) {
             this.balance = this.web3.utils.fromWei(_balance, "ether");
@@ -425,6 +423,9 @@ class Assets extends Component {
         if (this.earningsKey in this.props.AssetContract["getEarnings"]) {
             this.earnings = this.web3.utils.fromWei(this.props.AssetContract["getEarnings"][this.earningsKey].value, "ether");
         }
+
+        this.props.onUpdateMenu(this.isContractOwner, this.earnings);
+
 
         if (this.validAssetIDsKey in this.props.AssetContract[this.props.fetchMethod]) {
             const validAssetIDs = this.props.AssetContract[this.props.fetchMethod][this.validAssetIDsKey].value;

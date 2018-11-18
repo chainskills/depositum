@@ -19,7 +19,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        OnMessage: (message) => dispatch(actions.updateMenu(message))
+        onUpdateMenu: (isOwner, earnings) => {
+            dispatch(actions.updateMenu(isOwner, earnings))
+        }
     };
 };
 

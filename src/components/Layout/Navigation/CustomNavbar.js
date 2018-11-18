@@ -22,7 +22,8 @@ class CustomNavbar extends Component {
 
     render() {
 
-        console.log("Into navbar: " + this.props.message);
+        console.log("IsOwner? " + this.props.isOwner);
+        console.log("Earnings: " + this.props.earnings);
 
 
         return (
@@ -50,7 +51,8 @@ class CustomNavbar extends Component {
 
 const mapStateToProps = state => {
     return {
-        message: state.assets.message
+        isOwner: state.assets.isOwner,
+        earnings: state.assets.earnings
     };
 };
 
