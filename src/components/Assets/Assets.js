@@ -379,6 +379,8 @@ class Assets extends Component {
 
 
     render() {
+        this.props.OnMessage("Hello");
+
         // refresh balance
         this.web3.eth.getBalance(this.props.accounts[0]).then(function (_balance) {
             this.balance = this.web3.utils.fromWei(_balance, "ether");

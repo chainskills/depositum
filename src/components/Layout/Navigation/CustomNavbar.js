@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import {drizzleConnect} from 'drizzle-react';
 import {Navbar, Nav, NavItem, NavLink, Collapse, NavbarBrand, NavbarToggler} from 'reactstrap';
 import {Link} from 'react-router-dom';
 
@@ -20,6 +21,10 @@ class CustomNavbar extends Component {
     }
 
     render() {
+
+        console.log("Into navbar: " + this.props.message);
+
+
         return (
             <Navbar expand="md" color="dark" dark>
                 <NavbarBrand href="/">
@@ -43,4 +48,10 @@ class CustomNavbar extends Component {
     }
 }
 
-export default CustomNavbar;
+const mapStateToProps = state => {
+    return {
+        message: state.assets.message
+    };
+};
+
+export default drizzleConnect(CustomNavbar, mapStateToProps, null);

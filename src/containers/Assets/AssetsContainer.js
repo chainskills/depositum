@@ -1,6 +1,7 @@
 import { drizzleConnect } from 'drizzle-react'
 
 import Assets from '../../components/Assets/Assets';
+import * as actions from '../../store/actions/assetActions';
 
 
 // May still need this even with data function to refresh component on updates for this contract.
@@ -16,6 +17,12 @@ const mapStateToProps = state => {
     }
 }
 
-const AssetsContainer = drizzleConnect(Assets, mapStateToProps);
+const mapDispatchToProps = dispatch => {
+    return {
+        OnMessage: (message) => dispatch(actions.updateMenu(message))
+    };
+};
+
+const AssetsContainer = drizzleConnect(Assets, mapStateToProps, mapDispatchToProps);
 
 export default AssetsContainer;
