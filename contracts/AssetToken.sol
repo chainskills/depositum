@@ -14,7 +14,7 @@ contract AssetToken is Ownable, ERC20Mintable {
     // Token identity
     string public constant name = 'Depositum';
     string public constant symbol = 'DPM';
-    uint8 public constant decimals = 1;
+    uint8 public constant decimals = 0;
 
     //
     // state variables
