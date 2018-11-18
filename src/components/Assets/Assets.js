@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Jumbotron, Card, CardBody, CardText, CardTitle, Col, Container, Row} from 'reactstrap';
+import {Jumbotron, Card, CardBody, CardText, CardTitle, CardFooter, Col, Container, Row, UncontrolledCollapse} from 'reactstrap';
 import Button from '@material-ui/core/Button';
 import {ContractData} from 'drizzle-react-components'
 
@@ -22,7 +22,9 @@ class Assets extends Component {
         super(props)
 
 
-        this.state = {};
+        this.state = {
+            openDetails: true
+        };
 
         this.web3 = context.drizzle.web3;
 
@@ -463,6 +465,18 @@ class Assets extends Component {
                                                      actionPurchase={this.handlePurchase.bind(this)}
                                                      actionRefund={this.handleRefund.bind(this)}/>
                             </CardBody>
+
+                            <CardFooter>
+                                <Button color="primary" id="toggler" style={{ marginBottom: '1rem' }}>
+                                    Details
+                                </Button>
+                                <UncontrolledCollapse toggler="#toggler">
+                                    Asset unique Id: {assetId}
+                                    <br/>
+                                    <ContractDataIPFS contract={this.assetContract.contractName} method="getHashKey"
+                                                                     methodArgs={assetId} onlyHash={true}/>
+                                </UncontrolledCollapse>
+                            </CardFooter>
                         </Card>
                     </Col>);
 

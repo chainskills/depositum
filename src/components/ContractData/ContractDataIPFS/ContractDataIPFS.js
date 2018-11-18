@@ -35,9 +35,13 @@ class ContractDataIPFS extends Component {
             return (<CardImg top className={"card-image"} src="./assets/house.png" alt="Card image cap" />);
         }
 
-        const displayData = this.props.contracts[this.props.contract][this.props.method][this.dataKey].value;
+        const ipfsHashKey = this.props.contracts[this.props.contract][this.props.method][this.dataKey].value;
 
-        const ipfsURL = IPFS_READ_URL + displayData;
+        const ipfsURL = IPFS_READ_URL + ipfsHashKey;
+
+        if (this.props.onlyHash) {
+            return (<a target="_blank" rel="noopener noreferrer" href={`${ipfsURL}`}>Link to IPFS</a>);
+        }
 
         return (<CardImg top className={"card-image"} src={`${ipfsURL}`} alt="Card image cap" />);
     }
