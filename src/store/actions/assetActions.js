@@ -8,3 +8,10 @@ export const updateMenu = (isOwner, earnings) => {
         earnings: earnings
     };
 };
+
+
+export const newAsset = () => {
+    return {
+        type: actionTypes.ASSET_NEW
+    };
+};

@@ -73,6 +73,41 @@ class Assets extends Component {
             // fetch the balance of earnings
             this.earningsKey = this.assetContract.methods["getEarnings"].cacheCall();
         }
+
+    }
+
+    static getDerivedStateFromProps(nextProps, prevState){
+
+        if (typeof nextProps.type === "undefined") {
+            // not ready yet
+            return null;
+        }
+
+        console.log("nextProps: " + nextProps.openAssetDialog);
+        console.log("prevState: " + prevState.openAssetDialog);
+
+        if (nextProps.openAssetDialog !== prevState.openAssetDialog) {
+            return({
+                openAssetDialog: nextProps.openAssetDialog
+            })
+        }
+
+        if (nextProps.type === prevState.type) {
+            // fields already updated or nothing to can
+            return null;
+        }
+
+
+
+        // pre-fill the state only the first time
+        return ({
+            type: nextProps.type,
+            assetId: nextProps.assetId,
+            name: nextProps.name,
+            description: nextProps.description,
+            price: nextProps.price,
+            imageSource: nextProps.imageSource !== "" ? nextProps.imageSource : '/images/asset.png'
+        });
     }
 
     componentWillUnmount() {
@@ -123,6 +158,7 @@ class Assets extends Component {
     }
 
     cancelDialog = () => {
+        console.log("hhhhh");
         this.hideDialogs();
         this.setState({
             action: '',
@@ -478,7 +514,7 @@ class Assets extends Component {
             <div>
                 <Container>
                     <Jumbotron>
-                        <h2>{this.props.title}</h2>
+                        <h2>{this.props.pageTitle}</h2>
                         <p>{this.props.subTitle}</p>
                         <br/>
                         <p>Your are connected on the network: {this.networkType}</p>
@@ -539,18 +575,18 @@ class Assets extends Component {
                 </Container>
 
                 <Asset
-                    type={this.state.type}
-                    open={this.state.openAssetDialog}
-                    title={this.state.title}
+                    type={this.props.type}
+                    open={this.props.openAssetDialog}
+                    title={this.props.title}
                     message={this.state.message}
                     account={this.props.accounts[0]}
                     web3={this.web3}
                     contract={this.assetContract}
-                    assetId={this.state.assetId}
-                    owner={this.state.owner}
-                    name={this.state.name}
-                    description={this.state.description}
-                    imageSource={this.state.imageSource}
+                    assetId={this.props.assetId}
+                    owner={this.props.owner}
+                    name={this.props.name}
+                    description={this.props.description}
+                    imageSource={this.props.imageSource}
                     ipfsHashKey={this.state.ipfsHashKey}
                     price={this.state.price}
                     cancel={this.cancelDialog.bind(this)}/>
