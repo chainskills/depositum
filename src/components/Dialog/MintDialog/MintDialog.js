@@ -104,7 +104,7 @@ class MintDialog extends Component {
 
                     <DialogContent>
                         <TextField
-                            label="Number of Depositum Token (DPN) to mint"
+                            label="Number of Depositum Token (DPM) to mint"
                             type="number"
                             defaultValue={this.state.mint}
                             fullWidth

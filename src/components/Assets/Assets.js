@@ -484,8 +484,8 @@ class Assets extends Component {
                         {this.isContractOwner &&
                         <p>Your earnings: {this.earnings} ETH</p>
                         }
-                        <p>Your tokens: {this.tokens} DPN</p>
-                        <p>Service Fee: {this.serviceFee} DPN</p>
+                        <p>Your tokens: {this.tokens} DPM</p>
+                        <p>Service Fee: {this.serviceFee} DPM</p>
                     </Jumbotron>
 
                     <Row>

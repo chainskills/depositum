@@ -147,6 +147,24 @@ class AssetDialog extends Component {
         reader.readAsArrayBuffer(selectedFile)
     }
 
+    loadContractualFile = (event) => {
+        event.preventDefault();
+        const selectedFile = event.target.files[0]
+        const reader = new FileReader()
+
+        reader.onloadend = () => {
+            this.setState({imageBuffer: Buffer(reader.result)});
+
+            const blob = new Blob([reader.result], {type: 'image/png'});
+            let imageSource = URL.createObjectURL(blob);
+
+            this.setState({newImageSource: imageSource});
+        };
+
+        reader.readAsArrayBuffer(selectedFile)
+    }
+
+
     render() {
         if ((typeof this.props.type === "undefined") || (this.props.type === "")) {
             // do not process this component if it's not required

@@ -66,7 +66,7 @@ class TokenDialog extends Component {
 
                     <DialogContent>
                         <TextField
-                            label="Rate (ETH)"
+                            label="Rate in ETH for 1 DPM"
                             defaultValue={this.props.tokenRate}
                             fullWidth
                             margin="normal"
@@ -80,7 +80,7 @@ class TokenDialog extends Component {
 
                         {this.props.type === "buy" &&
                         <TextField
-                            label="Depositum Token (DPN)"
+                            label="Number of Depositum Token (DPM) to buy"
                             type="number"
                             defaultValue={this.state.price}
                             fullWidth
@@ -100,7 +100,7 @@ class TokenDialog extends Component {
 
                         {this.props.type === "mint" &&
                         <TextField
-                            label="Number of Depositum Token (DPN) to mint"
+                            label="Number of Depositum Token (DPM) to mint"
                             type="number"
                             defaultValue={this.state.mint}
                             fullWidth
