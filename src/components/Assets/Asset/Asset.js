@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 
 import AssetDialog from '../../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../../Dialog/AlertDialog/AlertDialog';
-import {ipfs} from "../../../store/ipfs/ipfs";
+import {ipfs} from '../../../store/ipfs/ipfs';
+import {encryptFile, decryptFile} from '../../../shared/security';
 
 
 class Asset extends Component {
@@ -23,8 +24,11 @@ class Asset extends Component {
         this.hideDialogs();
 
         if (asset.imageBuffer != null) {
+
+            const encryptedFile = encryptFile(asset.imageBuffer, "pass123", this.props.account);
+
             // save the document to IPFS
-            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
+            ipfs.files.add(encryptedFile, {pin: true}, (error, result) => {
                 if (error) {
                     console.error(error)
                     return
@@ -39,7 +43,6 @@ class Asset extends Component {
                     from: this.props.account,
                     gas: 500000
                 });
-
             });
         }
     }

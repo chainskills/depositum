@@ -1,4 +1,3 @@
-
 # The following settings disable the sync to the public nodes
 #ipfs config Addresses.Gateway /ip4/127.0.0.1/tcp/8082
 
