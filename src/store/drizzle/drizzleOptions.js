@@ -15,7 +15,7 @@ const drizzleOptions = {
         AssetContract: ['NewAsset', 'AssetRemoved', 'Transfer', 'Approval']
     },
     polls: {
-        accounts: 1500
+        accounts: 15000
     }
 };
 

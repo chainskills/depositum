@@ -4,7 +4,7 @@ import {Jumbotron, Card, CardBody, CardText, CardTitle, CardFooter, Col, Contain
 import Button from '@material-ui/core/Button';
 import {ContractData} from 'drizzle-react-components'
 
-import {IPFS_READ_URL} from "../../store/ipfs/ipfs";
+import {ipfs, IPFS_READ_URL} from "../../store/ipfs/ipfs";
 import ContractDataIPFS from '../ContractData/ContractDataIPFS/ContractDataIPFS';
 import ContractDataAmount from '../ContractData/ContractDataAmount/ContractDataAmount';
 import ContractDataActions from '../ContractData/ContractDataActions/ContractDataActions';
@@ -14,6 +14,7 @@ import Token from './Tokens/Tokens';
 import Marketplace from './Marketplace/Marketplace';
 
 import './Assets.css';
+import {decryptFile} from "../../shared/security";
 
 
 class Assets extends Component {
@@ -201,23 +202,37 @@ class Assets extends Component {
                 return;
             }
 
-            const ipfsURL = IPFS_READ_URL + asset._hashKey;
+            ipfs.files.cat(asset._hashKey, function (err, data) {
+                if (err) {
+                    console.error(err);
+                } else {
 
-            const price = this.web3.utils.fromWei(asset._price, "ether");
+                    let imgSource = decryptFile(data, "pass123", asset._owner);
 
-            this.hideDialogs();
-            this.setState({
-                type: 'edit',
-                title: 'Edit your asset',
-                assetId: assetId,
-                owner: asset._owner,
-                name: asset._name,
-                description: asset._description,
-                ipfsHashKey: asset._hashKey,
-                imageSource: ipfsURL,
-                price: price,
-                openAssetDialog: true
-            });
+                    const ipfsURL = "data:" + "'image/png'" + ";base64," + imgSource;
+                    // var imgContent = "data:" + imgType + ";base64," + plainFile;
+
+                    const price = this.web3.utils.fromWei(asset._price, "ether");
+
+                    this.hideDialogs();
+                    this.setState({
+                        type: 'edit',
+                        title: 'Edit your asset',
+                        assetId: assetId,
+                        owner: asset._owner,
+                        name: asset._name,
+                        description: asset._description,
+                        ipfsHashKey: asset._hashKey,
+                        imageSource: ipfsURL,
+                        price: price,
+                        openAssetDialog: true
+                    });
+                }
+            }.bind(this));
+
+            //const ipfsURL = IPFS_READ_URL + asset._hashKey;
+
+
 
         }.bind(this));
     }
@@ -440,7 +455,8 @@ class Assets extends Component {
                     <Col xs={6} md={6} key={assetId} className="vertical-spacing">
                         <Card>
                             <ContractDataIPFS contract={this.assetContract.contractName} method="getHashKey"
-                                              methodArgs={assetId}/>
+                                              methodArgs={assetId} account={this.props.accounts[0]}/>
+
 
                             <CardBody>
                                 <CardTitle>
@@ -474,7 +490,7 @@ class Assets extends Component {
                                     Asset unique Id: {assetId}
                                     <br/>
                                     <ContractDataIPFS contract={this.assetContract.contractName} method="getHashKey"
-                                                                     methodArgs={assetId} onlyHash={true}/>
+                                                                     methodArgs={assetId} onlyHash={true} account={this.props.accounts[0]}/>
                                 </UncontrolledCollapse>
                             </CardFooter>
                         </Card>
