@@ -6,6 +6,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import FormGroup from '@material-ui/core/FormGroup';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Switch from '@material-ui/core/Switch';
 import {withStyles} from '@material-ui/core/styles';
 
 
@@ -33,14 +36,15 @@ class AssetDialog extends Component {
             imageBuffer: null,
             price: '',
             imageSource: '/images/asset.png',
-            newImageSource: ''
+            newImageSource: '',
+            encrypt: false,
         };
 
         this.handleClose = this.handleClose.bind(this);
     }
 
 
-    static getDerivedStateFromProps(nextProps, prevState){
+    static getDerivedStateFromProps(nextProps, prevState) {
 
         if (typeof nextProps.type === "undefined") {
             // not ready yet
@@ -59,7 +63,8 @@ class AssetDialog extends Component {
             name: nextProps.name,
             description: nextProps.description,
             price: nextProps.price,
-            imageSource: nextProps.imageSource !== "" ? nextProps.imageSource : '/images/asset.png'
+            imageSource: nextProps.imageSource !== "" ? nextProps.imageSource : '/images/asset.png',
+            encrypt: nextProps.encrypted
         });
     }
 
@@ -108,6 +113,20 @@ class AssetDialog extends Component {
         });
     };
 
+    encryptFile = (e) => {
+        this.setState({
+            encrypt: e.target.checked
+        });
+    };
+
+    setPassword = (e) => {
+        this.setState({
+            password: e,
+            passwordError: false
+        })
+    }
+
+
     // save the asset
     saveAsset = (event) => {
         const {assetId, name, description, imageBuffer, newImageSource, price} = this.state;
@@ -131,23 +150,6 @@ class AssetDialog extends Component {
     }
 
     loadFile = (event) => {
-        event.preventDefault();
-        const selectedFile = event.target.files[0]
-        const reader = new FileReader()
-
-        reader.onloadend = () => {
-            this.setState({imageBuffer: Buffer(reader.result)});
-
-            const blob = new Blob([reader.result], {type: 'image/png'});
-            let imageSource = URL.createObjectURL(blob);
-
-            this.setState({newImageSource: imageSource});
-        };
-
-        reader.readAsArrayBuffer(selectedFile)
-    }
-
-    loadContractualFile = (event) => {
         event.preventDefault();
         const selectedFile = event.target.files[0]
         const reader = new FileReader()
@@ -204,14 +206,16 @@ class AssetDialog extends Component {
                     <DialogContent>
 
                         <Grid container>
-                            <Grid item xs={4} container direction="column" spacing={16} alignItems="center" justify="center">
+                            <Grid item xs={4} container direction="column" spacing={16} alignItems="center"
+                                  justify="center">
                                 <Grid item>
                                     <img className={classes.img} style={{width: '250px'}} alt="asset"
                                          src={`${imageSourceNew}`}/>
                                 </Grid>
                                 {this.props.type !== "read" &&
                                 <Grid item>
-                                    <input type='file' className={classes.inputFile} onChange={this.loadFile} accept="image/*" ref={'file-upload'} />
+                                    <input type='file' className={classes.inputFile} onChange={this.loadFile}
+                                           accept="image/*" ref={'file-upload'}/>
                                     <Button
                                         label="Upload"
                                         variant="outlined"
@@ -219,6 +223,18 @@ class AssetDialog extends Component {
                                         onClick={e => {
                                             this.refs['file-upload'].click()
                                         }}>Add a picture ...</Button>
+
+                                    <FormGroup row>
+                                        <FormControlLabel
+                                            control={
+                                                <Switch
+                                                    checked={this.state.encrypted}
+                                                    onChange={this.encryptFile}
+                                                />
+                                            }
+                                            label="Encrypt"
+                                        />
+                                    </FormGroup>
                                 </Grid>
                                 }
                             </Grid>
@@ -278,6 +294,25 @@ class AssetDialog extends Component {
                                         readOnly: this.props.type === "read" ? true : false
                                     }}
                                 />
+
+                                {this.state.encrypt && (this.props.type !== "read") &&
+                                <TextField
+                                    label="Password"
+                                    type="password"
+                                    defaultValue={this.state.password}
+                                    fullWidth
+                                    error={this.state.passwordError}
+                                    onChange={e => {
+                                        this.setPassword(e.target.value)
+                                    }}
+                                    margin="normal"
+                                    inputProps={{
+                                        classes: {
+                                            input: classes.textSettings,
+                                        }
+                                    }}
+                                />
+                                }
                             </Grid>
                         </Grid>
 
