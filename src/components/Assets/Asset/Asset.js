@@ -23,12 +23,20 @@ class Asset extends Component {
     addAsset = (asset) => {
         this.hideDialogs();
 
+        console.log(asset);
         if (asset.imageBuffer != null) {
 
-            const encryptedFile = encryptFile(asset.imageBuffer, "pass123", this.props.account);
+            let assetFile = asset.imageBuffer;
+
+            if (asset.encrypted) {
+                // we encrypt the file only if we are the owner
+
+                // TODO: DO not use static password !!!
+                assetFile = encryptFile(asset.imageBuffer, "depositum", this.props.account);
+            }
 
             // save the document to IPFS
-            ipfs.files.add(encryptedFile, {pin: true}, (error, result) => {
+            ipfs.files.add(assetFile, {pin: true}, (error, result) => {
                 if (error) {
                     console.error(error)
                     return
@@ -39,13 +47,14 @@ class Asset extends Component {
                     price = this.props.web3.utils.toWei(price, "ether");
                 }
 
-                this.props.contract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, price, {
+                this.props.contract.methods.addAsset.cacheSend(asset.name, asset.description, result[0].hash, price, asset.encrypted, {
                     from: this.props.account,
                     gas: 500000
                 });
             });
         }
     }
+
 
     updateAsset = (asset) => {
         this.hideDialogs();
@@ -55,15 +64,27 @@ class Asset extends Component {
             price = this.props.web3.utils.toWei(price, "ether");
         }
 
+        console.log(asset);
         if (asset.imageBuffer != null) {
+            let assetFile = asset.imageBuffer;
+
+            if (this.props.owner === this.props.account) {
+                if (this.props.encrypted && (this.props.encrypted !== asset.encrypted)) {
+                    // we encrypt the file only if we are the owner
+
+                    // TODO: DO not use static password !!!
+                    assetFile = encryptFile(asset.imageBuffer, "depositum", this.props.account);
+                }
+            }
+
             // save the document to IPFS
-            ipfs.files.add(asset.imageBuffer, {pin: true}, (error, result) => {
+            ipfs.files.add(assetFile, {pin: true}, (error, result) => {
                 if (error) {
                     console.error(error)
                     return
                 }
 
-                this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, {
+                this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, result[0].hash, price, asset.encrypted, {
                     from: this.props.account,
                     gas: 500000
                 });
@@ -71,7 +92,7 @@ class Asset extends Component {
             });
         } else {
             // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
-            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.props.ipfsHashKey, price, {
+            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.props.ipfsHashKey, price, asset.encrypted, {
                 from: this.props.account,
                 gas: 500000
             });
@@ -117,6 +138,7 @@ class Asset extends Component {
                     description={this.props.description}
                     imageSource={this.props.imageSource}
                     price={this.props.price}
+                    encrypted={this.props.encrypted}
                     readOnly={this.props.type === "read" ? true : false}
                     action={this.props.type === "new" ? this.addAsset.bind(this) : this.updateAsset.bind(this)}
                     cancel={this.hideDialogs.bind(this)}/>

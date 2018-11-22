@@ -70,7 +70,7 @@ class ContractDataActions extends Component {
             buttons.push(<Button variant="contained" key={`button-edit-${this.props.assetId}`}
                                  onClick={() => this.props.actionEdit(this.props.assetId)}>Edit</Button>);
 
-            if (asset._available) {
+            if (asset._marketplace) {
                 buttons.push(<Button variant="contained" className={'float-right'}
                                      key={`button-unset-${this.props.assetId}`}
                                      onClick={() => this.props.actionUnset(this.props.assetId)}>To Keep</Button>);

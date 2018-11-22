@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 import "./AssetToken.sol";
 
@@ -22,7 +22,8 @@ contract AssetContract is AssetToken {
         string description;
         string hashKey;         // hashkey of the asset stored in IPFS
         uint256 price;          // price in Wei
-        bool available;         // true if the asset can be sold in the marketplace
+        bool encrypted;         // true if the asset has been encrypted
+        bool marketplace;         // true if the asset can be sold in the marketplace
     }
 
     // List of asset
@@ -66,7 +67,7 @@ contract AssetContract is AssetToken {
     }
 
     // add a new asset
-    function addAsset(string _name, string _description, string _hashKey, uint256 _price) public {
+    function addAsset(string memory _name, string memory _description, string memory _hashKey, uint256 _price, bool _encrypted) public {
         // a name is required
         bytes memory name = bytes(_name);
         require(name.length > 0, "A name is required");
@@ -86,14 +87,14 @@ contract AssetContract is AssetToken {
         assetCounter = assetCounter.add(1);
 
         // store the new asset
-        assets[assetCounter] = AssetItem(assetCounter, msg.sender, 0x0, _name, _description, _hashKey, _price, false);
+        assets[assetCounter] = AssetItem(assetCounter, msg.sender, 0x0, _name, _description, _hashKey, _price, _encrypted, false);
 
         emit NewAsset(assetCounter, msg.sender, _name, _description, _hashKey, _price);
     }
 
     // update an existing asset
     // only possible for the asset's owner
-    function updateAsset(uint256 _assetId, string _name, string _description, string _hashKey, uint256 _price) public {
+    function updateAsset(uint256 _assetId, string memory _name, string memory _description, string memory _hashKey, uint256 _price, bool _encrypted) public {
         AssetItem storage asset = assets[_assetId];
 
         // is this asset exists?
@@ -121,6 +122,7 @@ contract AssetContract is AssetToken {
         asset.description = _description;
         asset.hashKey = _hashKey;
         asset.price = _price;
+        asset.encrypted = _encrypted;
 
         emit UpdateAsset(_assetId, msg.sender, _name, _description, _hashKey, _price);
     }
@@ -139,7 +141,7 @@ contract AssetContract is AssetToken {
         require(msg.sender == asset.owner, "Action allowed only to the owner");
 
         // update the availability of the asset in the marketplace
-        asset.available = true;
+        asset.marketplace = true;
 
         emit SetMarketplace(_assetId, msg.sender, asset.name, asset.description, asset.price);
     }
@@ -158,7 +160,7 @@ contract AssetContract is AssetToken {
         require(msg.sender == asset.owner, "Action allowed only to the owner");
 
         // update the availability of the asset in the marketplace
-        asset.available = false;
+        asset.marketplace = false;
 
         if (asset.candidate != 0x0) {
             // we need to refund by sending back the deposit to the candidate
@@ -217,7 +219,7 @@ contract AssetContract is AssetToken {
         asset.owner = msg.sender;
         asset.candidate = 0x0;
         asset.price = 0;
-        asset.available = false;
+        asset.marketplace = false;
         delete depositsBalance[_assetId];
 
         if (_price != 0) {
@@ -270,7 +272,7 @@ contract AssetContract is AssetToken {
     }
 
     // return asset IDs owned by the function's caller
-    function getMyAssets() view public returns (uint[]) {
+    function getMyAssets() view public returns (uint[] memory) {
         if (assetCounter == 0) {
             return new uint[](0);
         }
@@ -322,7 +324,7 @@ contract AssetContract is AssetToken {
     }
 
     // return asset IDs published in the marketplace
-    function getMarketplace() view public returns (uint[]) {
+    function getMarketplace() view public returns (uint[] memory) {
         if (assetCounter == 0) {
             return new uint[](0);
         }
@@ -334,7 +336,7 @@ contract AssetContract is AssetToken {
         uint256 numberOfAssets = 0;
         for (uint i = 1; i <= assetCounter; i++) {
             // keep the ID of the asset published in the marketplace
-            if (assets[i].available) {
+            if (assets[i].marketplace) {
                 assetIDs[numberOfAssets] = assets[i].id;
 
                 numberOfAssets = numberOfAssets.add(1);
@@ -354,17 +356,18 @@ contract AssetContract is AssetToken {
     function getAsset(uint _assetId) view public returns (
         address _owner,
         address _candidate,
-        string _name,
-        string _description,
-        string _hashKey,
+        string memory _name,
+        string memory _description,
+        string memory _hashKey,
         uint256 _price,
-        bool _available) {
+        bool _encrypted,
+        bool _marketplace) {
 
         AssetItem memory asset = assets[_assetId];
 
         // ensure that we have an asset to fetch
         if (asset.owner == 0x0) {
-            return (0x0, 0x0, "", "", "", 0, false);
+            return (0x0, 0x0, "", "", "", 0, false, false);
         }
 
         return (
@@ -374,7 +377,8 @@ contract AssetContract is AssetToken {
             asset.description,
             asset.hashKey,
             asset.price,
-            asset.available);
+            asset.encrypted,
+            asset.marketplace);
     }
 
 
@@ -404,7 +408,7 @@ contract AssetContract is AssetToken {
     }
 
 
-    function getName(uint _assetId) view public returns (string) {
+    function getName(uint _assetId) view public returns (string memory) {
         AssetItem memory asset = assets[_assetId];
 
         // ensure that we have an asset to fetch
@@ -416,7 +420,7 @@ contract AssetContract is AssetToken {
         return asset.name;
     }
 
-    function getDescription(uint _assetId) view public returns (string) {
+    function getDescription(uint _assetId) view public returns (string memory) {
         AssetItem memory asset = assets[_assetId];
 
         // ensure that we have an asset to fetch
@@ -428,16 +432,16 @@ contract AssetContract is AssetToken {
         return asset.description;
     }
 
-    function getHashKey(uint _assetId) view public returns (string) {
+    function getHashKey(uint _assetId) view public returns (string memory _hashKey, bool _encrypted) {
         AssetItem memory asset = assets[_assetId];
 
         // ensure that we have an asset to fetch
         if (asset.owner == 0x0) {
-            return ("");
+            return ("", false);
         }
 
 
-        return asset.hashKey;
+        return (asset.hashKey, asset.encrypted);
     }
 
     function getPrice(uint _assetId) view public returns (uint256) {
@@ -452,7 +456,7 @@ contract AssetContract is AssetToken {
         return asset.price;
     }
 
-    function getAvailability(uint _assetId) view public returns (bool) {
+    function isMarketplace(uint _assetId) view public returns (bool) {
         AssetItem memory asset = assets[_assetId];
 
         // ensure that we have an asset to fetch
@@ -461,7 +465,7 @@ contract AssetContract is AssetToken {
         }
 
 
-        return asset.available;
+        return asset.marketplace;
     }
 
     function isContractOwner() view public returns (bool) {

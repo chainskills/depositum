@@ -37,7 +37,7 @@ class AssetDialog extends Component {
             price: '',
             imageSource: '/images/asset.png',
             newImageSource: '',
-            encrypt: false,
+            encrypted: false,
         };
 
         this.handleClose = this.handleClose.bind(this);
@@ -64,7 +64,7 @@ class AssetDialog extends Component {
             description: nextProps.description,
             price: nextProps.price,
             imageSource: nextProps.imageSource !== "" ? nextProps.imageSource : '/images/asset.png',
-            encrypt: nextProps.encrypted
+            encrypted: nextProps.encrypted
         });
     }
 
@@ -115,21 +115,13 @@ class AssetDialog extends Component {
 
     encryptFile = (e) => {
         this.setState({
-            encrypt: e.target.checked
+            encrypted: e.target.checked
         });
     };
 
-    setPassword = (e) => {
-        this.setState({
-            password: e,
-            passwordError: false
-        })
-    }
-
-
     // save the asset
     saveAsset = (event) => {
-        const {assetId, name, description, imageBuffer, newImageSource, price} = this.state;
+        const {assetId, name, description, imageBuffer, newImageSource, price, encrypted} = this.state;
 
         if (!this.checkValidity(name, description)) {
             return;
@@ -137,7 +129,7 @@ class AssetDialog extends Component {
 
         const ipfsHashKey = newImageSource;
 
-        let asset = {assetId, name, description, imageBuffer, ipfsHashKey, price};
+        let asset = {assetId, name, description, imageBuffer, ipfsHashKey, price, encrypted};
 
         this.resetState();
         this.props.action(asset);
@@ -294,25 +286,6 @@ class AssetDialog extends Component {
                                         readOnly: this.props.type === "read" ? true : false
                                     }}
                                 />
-
-                                {this.state.encrypt && (this.props.type !== "read") &&
-                                <TextField
-                                    label="Password"
-                                    type="password"
-                                    defaultValue={this.state.password}
-                                    fullWidth
-                                    error={this.state.passwordError}
-                                    onChange={e => {
-                                        this.setPassword(e.target.value)
-                                    }}
-                                    margin="normal"
-                                    inputProps={{
-                                        classes: {
-                                            input: classes.textSettings,
-                                        }
-                                    }}
-                                />
-                                }
                             </Grid>
                         </Grid>
 

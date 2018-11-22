@@ -136,7 +136,8 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             ipfsHashKey: '',
-            price: ''
+            price: '',
+            encrypted: false
         });
     }
 
@@ -190,6 +191,7 @@ class Assets extends Component {
             description: '',
             imageSource: '',
             price: '',
+            encrypted: false,
             openAssetDialog: true
         });
     }
@@ -202,15 +204,24 @@ class Assets extends Component {
                 return;
             }
 
+            console.log("aaaaa");
             ipfs.files.cat(asset._hashKey, function (err, data) {
                 if (err) {
                     console.error(err);
                 } else {
 
-                    let imgSource = decryptFile(data, "pass123", asset._owner);
+                    let ipfsURL = '';
 
-                    const ipfsURL = "data:" + "'image/png'" + ";base64," + imgSource;
-                    // var imgContent = "data:" + imgType + ";base64," + plainFile;
+                    if (asset._encrypted) {
+                        if (asset._owner === this.props.accounts[0]) {
+                            const imgSource = decryptFile(data, "depositum", asset._owner);
+                            ipfsURL = "data:" + "'image/png'" + ";base64," + imgSource;
+                        } else {
+                            ipfsURL = "/images/encrypted.png";
+                        }
+                    } else {
+                        ipfsURL = IPFS_READ_URL + asset._hashKey;
+                    }
 
                     const price = this.web3.utils.fromWei(asset._price, "ether");
 
@@ -225,6 +236,7 @@ class Assets extends Component {
                         ipfsHashKey: asset._hashKey,
                         imageSource: ipfsURL,
                         price: price,
+                        encrypted: asset._encrypted,
                         openAssetDialog: true
                     });
                 }
@@ -245,7 +257,13 @@ class Assets extends Component {
                 return;
             }
 
-            const ipfsURL = IPFS_READ_URL + asset._hashKey;
+            let ipfsURL = '';
+            if (asset._encrypted) {
+                ipfsURL = "/images/encrypted.png";
+            } else {
+                ipfsURL = IPFS_READ_URL + asset._hashKey;
+            }
+
 
             const price = this.web3.utils.fromWei(asset._price, "ether");
 
@@ -260,6 +278,7 @@ class Assets extends Component {
                 ipfsHashKey: asset._hashKey,
                 imageSource: ipfsURL,
                 price: price,
+                encrypted: asset._encrypted,
                 openAssetDialog: true
             });
 
@@ -580,6 +599,7 @@ class Assets extends Component {
                     imageSource={this.state.imageSource}
                     ipfsHashKey={this.state.ipfsHashKey}
                     price={this.state.price}
+                    encrypted={this.state.encrypted}
                     cancel={this.cancelDialog.bind(this)}/>
 
                 <Token
