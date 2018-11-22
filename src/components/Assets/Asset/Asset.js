@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import AssetDialog from '../../Dialog/AssetDialog/AssetDialog';
 import AlertDialog from '../../Dialog/AlertDialog/AlertDialog';
 import {ipfs} from '../../../store/ipfs/ipfs';
-import {encryptFile, decryptFile} from '../../../shared/security';
+import {encryptFile} from '../../../shared/security';
 
 
 class Asset extends Component {
@@ -32,7 +32,7 @@ class Asset extends Component {
                 // we encrypt the file only if we are the owner
 
                 // TODO: DO not use static password !!!
-                assetFile = encryptFile(asset.imageBuffer, "depositum", this.props.account);
+                assetFile = encryptFile(asset.imageBuffer, "depositum");
             }
 
             // save the document to IPFS
@@ -73,7 +73,7 @@ class Asset extends Component {
                     // we encrypt the file only if we are the owner
 
                     // TODO: DO not use static password !!!
-                    assetFile = encryptFile(asset.imageBuffer, "depositum", this.props.account);
+                    assetFile = encryptFile(asset.imageBuffer, "depositum");
                 }
             }
 

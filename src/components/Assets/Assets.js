@@ -214,7 +214,7 @@ class Assets extends Component {
 
                     if (asset._encrypted) {
                         if (asset._owner === this.props.accounts[0]) {
-                            const imgSource = decryptFile(data, "depositum", asset._owner);
+                            const imgSource = decryptFile(data, "depositum");
                             ipfsURL = "data:" + "'image/png'" + ";base64," + imgSource;
                         } else {
                             ipfsURL = "/images/encrypted.png";
@@ -472,7 +472,7 @@ class Assets extends Component {
 
                 const item = (
                     <Col xs={6} md={6} key={assetId} className="vertical-spacing">
-                        <Card>
+                        <Card key={assetId}>
                             <ContractDataIPFS contract={this.assetContract.contractName} method="getHashKey"
                                               methodArgs={assetId} account={this.props.accounts[0]}/>
 
