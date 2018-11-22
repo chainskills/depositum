@@ -204,7 +204,6 @@ class Assets extends Component {
                 return;
             }
 
-            console.log("aaaaa");
             ipfs.files.cat(asset._hashKey, function (err, data) {
                 if (err) {
                     console.error(err);

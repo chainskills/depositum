@@ -69,7 +69,7 @@ class Asset extends Component {
             let assetFile = asset.imageBuffer;
 
             if (this.props.owner === this.props.account) {
-                if (this.props.encrypted && (this.props.encrypted !== asset.encrypted)) {
+                if (asset.encrypted && (this.props.encrypted !== asset.encrypted)) {
                     // we encrypt the file only if we are the owner
 
                     // TODO: DO not use static password !!!
@@ -92,7 +92,7 @@ class Asset extends Component {
             });
         } else {
             // image not changed -> update asset with the ipfs hash key retrieved during the getAsset() function call
-            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.props.ipfsHashKey, price, asset.encrypted, {
+            this.props.contract.methods.updateAsset.cacheSend(asset.assetId, asset.name, asset.description, this.props.ipfsHashKey, price, this.props.encrypted, {
                 from: this.props.account,
                 gas: 500000
             });

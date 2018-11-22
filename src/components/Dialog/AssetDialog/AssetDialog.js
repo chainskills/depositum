@@ -216,6 +216,7 @@ class AssetDialog extends Component {
                                             this.refs['file-upload'].click()
                                         }}>Add a picture ...</Button>
 
+                                    {((this.props.type === "new") || (this.state.imageBuffer !== null)) &&
                                     <FormGroup row>
                                         <FormControlLabel
                                             control={
@@ -227,6 +228,7 @@ class AssetDialog extends Component {
                                             label="Encrypt"
                                         />
                                     </FormGroup>
+                                    }
                                 </Grid>
                                 }
                             </Grid>
