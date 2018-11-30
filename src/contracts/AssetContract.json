@@ -34710,12 +34710,12 @@
         }
       },
       "links": {},
-      "address": "0x04D979eF1b1E3F001d9F11cB2a17b601a587Aa8C",
-      "transactionHash": "0xeb3b84327cc7660761dd1517586c7f2d55c07686a0bc66e5b78b189feb18691c"
+      "address": "0xDaeb7b53721e9Ff504396A0F84041b4E1e879b25",
+      "transactionHash": "0xbadbc27d4edfcef5898b9c53dcc21ffd689e2c3aa90e5c3ab41412b5bec42646"
     }
   },
   "schemaVersion": "3.0.0-beta.2",
-  "updatedAt": "2018-11-22T00:11:28.992Z",
+  "updatedAt": "2018-11-27T07:50:37.325Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {
